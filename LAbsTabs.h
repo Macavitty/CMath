@@ -4,33 +4,46 @@
 #include <QDialog>
 #include <QtWidgets/QShortcut>
 #include <QtWidgets/QGroupBox>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QLabel>
+#include <QDoubleValidator>
 
 class QTabWidget;
 class QMenu;
 class QMenuBar;
 
 // Tabs
-class LinerSystemTab : public QWidget{
+class LinearSystemTab : public QWidget{
 Q_OBJECT
 public:
-    explicit LinerSystemTab(QWidget *parent = nullptr);
+    explicit LinearSystemTab(QWidget *parent = nullptr);
 
 private slots:
     void changeNumber(int value);
+    void reset();
+    void setRandom();
+    void takeFromFile();
+    void solve();
 
 private:
     QLineEdit *matrixA[20][20];
-    QGroupBox *gridGroupBox, *filtGroupBox ;
+    QLineEdit *matrixB[20];
+    QDoubleValidator *doubleValidator;
+    QGroupBox *gridGroupBox, *filtGroupBox, *buttonsGroupBox;
     QTextEdit *answerField;
-    QLineEdit *taskField;
+    QLineEdit *precisionField;
     QSlider *numberSlider;
     QLabel *numberLabel;
+    QPushButton *randButton, *fileButton, *solveButton, *resetButton;
 
     void setSlider();
+    void setAMatrix(QGridLayout *aCells);
+    void setBMatrix(QGridLayout *bCells);
+    void setButtons();
+    double randomDouble(double lower, double upper);
 
 };
 class IntegrationTab : public QWidget {
