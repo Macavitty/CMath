@@ -1,52 +1,15 @@
-#include <QtWidgets/QVBoxLayout>
 #include <QTabWidget>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QLineEdit>
-#include <QDoubleValidator>
 #include <QtWidgets/QFormLayout>
-#include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtCore/QFile>
 #include <QtWidgets/QMessageBox>
 #include <QtCore/QDir>
-#include "LAbsTabs.h"
+#include "LinearSystemTab.h"
 
-LAbsTabs::LAbsTabs(QWidget *parent) : QDialog(parent) {
-    tabWidget = new QTabWidget;
-    tabWidget->addTab(new LinearSystemTab, tr("СЛАУ"));
-    tabWidget->addTab(new IntegrationTab(), tr("Интегрирование"));
-    tabWidget->addTab(new Interpolation(), tr("Интерполирование"));
-    tabWidget->addTab(new ODETab(), tr("ОДУ"));
-
-    auto *mainLayout = new QVBoxLayout;
-
-    // set menu
-    menuBar = new QMenuBar;
-    simpleMenu = new QMenu(tr("МЕНЮ"), this);
-    exitAction = simpleMenu->addAction(tr("Выйти"));
-    menuBar->addMenu(simpleMenu);
-    connect(exitAction, SIGNAL(triggered()), this, SLOT(exitProgramm()));
-    // hot key
-    keyCtrlW = new QShortcut(this);
-    keyCtrlW->setKey(Qt::CTRL + Qt::Key_W);
-    connect(keyCtrlW, SIGNAL(activated()), this, SLOT(exitProgramm()));
-
-    mainLayout->setMenuBar(menuBar);
-    mainLayout->addWidget(tabWidget);
-    setLayout(mainLayout);
-
-    setWindowTitle(tr("Tab Dialog"));
-}
-
-void LAbsTabs::exitProgramm() {
-    this->close();
-}
-
-// TODO make consts for number
-// Tabs
 LinearSystemTab::LinearSystemTab(QWidget *parent) : QWidget(parent) {
     auto *mainLayout = new QVBoxLayout;
-
+// TODO make consts for number
     // MATRIX
     gridGroupBox = new QGroupBox(tr(""));
     auto *matrixLayout = new QGridLayout;
@@ -124,7 +87,17 @@ void LinearSystemTab::setButtons() {
 }
 
 void LinearSystemTab::solve() {
-
+    int n = numberSlider->value();
+    double e = precisionField->text().replace(",", ".").toDouble();
+    auto **A = new long double*[n], *B = new long double[n];
+    for (int i = 0 ; i <n ; i++) A[i] = new long double[n];
+   for (auto i = 0; i < n; i++){
+        B[i] = matrixB[i]->text().replace(",", ".").toDouble();
+        for (auto j = 0; j < n; j++){
+            A[i][j] = matrixA[i][j]->text().replace(",", ".").toDouble();
+        }
+    }
+    compute(A, B, n, e);
 }
 
 void LinearSystemTab::takeFromFile() {
@@ -154,9 +127,10 @@ void LinearSystemTab::takeFromFile() {
 }
 
 void LinearSystemTab::reset() {
-    for (auto i = 0; i < 20; i++) {
+    int n = numberSlider->value();
+    for (auto i = 0; i < n; i++) {
         matrixB[i]->setText("0");
-        for (auto j = 0; j < 20; j++) {
+        for (auto j = 0; j < n; j++) {
             matrixA[i][j]->setText("0");
         }
     }
@@ -209,7 +183,7 @@ void LinearSystemTab::setAMatrix(QGridLayout *aCells) {
             aCell->setText("0");
             aCell->setValidator(new QDoubleValidator);
             aCell->setMaximumSize(50, 15);
-            aCell->setMaxLength(10);
+            aCell->setMaxLength(20);
             aCells->addWidget(aCell, i, j);
             matrixA[i][j] = aCell;
         }
@@ -223,7 +197,7 @@ void LinearSystemTab::setBMatrix(QGridLayout *bCells) {
         bCell->setText("0");
         bCell->setValidator(new QDoubleValidator);
         bCell->setMaximumSize(50, 15);
-        bCell->setMaxLength(10);
+        bCell->setMaxLength(20);
         bCells->addWidget(new QLabel(tr(" = ")), i, 0);
         bCells->addWidget(bCell, i, 1);
         matrixB[i] = bCell;
@@ -233,12 +207,12 @@ void LinearSystemTab::setBMatrix(QGridLayout *bCells) {
 void LinearSystemTab::changeNumber(int value) {
     numberLabel->setText(QString::fromStdString(std::to_string(value)));
     for (auto i = value; i < 20; i++) {
-        matrixB[i]->setText("0");
+        //matrixB[i]->setText("0");
         matrixB[i]->setEnabled(false);
         for (auto j = 0; j < 20; j++) {
-            matrixA[i][j]->setText("0");
+            //matrixA[i][j]->setText("0");
             matrixA[i][j]->setEnabled(false);
-            matrixA[j][i]->setText("0");
+            //matrixA[j][i]->setText("0");
             matrixA[j][i]->setEnabled(false);
         }
     }
@@ -250,14 +224,9 @@ void LinearSystemTab::changeNumber(int value) {
     }
 }
 
-IntegrationTab::IntegrationTab(QWidget *parent) : QWidget(parent) {
-
-}
-
-Interpolation::Interpolation(QWidget *parent) : QWidget(parent) {
-
-}
-
-ODETab::ODETab(QWidget *parent) : QWidget(parent) {
-
-}
+/*
+ * выбор файла
+ * удаление лишних
+ * точна/запятая
+ * nan - система не решается методом гаусса
+ * */

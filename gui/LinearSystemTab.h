@@ -1,6 +1,5 @@
-
-#ifndef COMPMATH_LABSTABS_H
-#define COMPMATH_LABSTABS_H
+#ifndef COMPMATH_LINEARSYSTEMTAB_H
+#define COMPMATH_LINEARSYSTEMTAB_H
 #include <QDialog>
 #include <QtWidgets/QShortcut>
 #include <QtWidgets/QGroupBox>
@@ -10,14 +9,11 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QLabel>
 #include <QDoubleValidator>
+#include "algos/LinearSystemSolver.h"
 
-class QTabWidget;
-class QMenu;
-class QMenuBar;
 
-// Tabs
-class LinearSystemTab : public QWidget{
-Q_OBJECT
+class LinearSystemTab : public QWidget {
+    Q_OBJECT
 public:
     explicit LinearSystemTab(QWidget *parent = nullptr);
 
@@ -44,36 +40,6 @@ private:
     void setBMatrix(QGridLayout *bCells);
     void setButtons();
     double randomDouble(double lower, double upper);
-
-};
-class IntegrationTab : public QWidget {
-
-public:
-    explicit IntegrationTab(QWidget *parent = nullptr);
-};
-class Interpolation : public QWidget {
-
-public:
-    explicit Interpolation(QWidget *parent = nullptr);
-};
-class ODETab : public QWidget {
-public:
-    explicit ODETab(QWidget *parent = nullptr);
 };
 
-class LAbsTabs : public QDialog{
-Q_OBJECT
-public:
-    explicit LAbsTabs(QWidget *parent = nullptr);
-private slots:
-    void exitProgramm();
-private:
-    QTabWidget *tabWidget;
-    QMenu *simpleMenu;
-    QMenuBar *menuBar;
-
-    QAction *exitAction;
-    QShortcut *keyCtrlW;
-};
-
-#endif //COMPMATH_LABSTABS_H
+#endif //COMPMATH_LINEARSYSTEMTAB_H
