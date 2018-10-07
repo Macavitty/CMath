@@ -5,6 +5,7 @@
 #include <QtCore/QFile>
 #include <QtWidgets/QMessageBox>
 #include <QtCore/QDir>
+#include <QFileDialog>
 #include "LinearSystemTab.h"
 
 LinearSystemTab::LinearSystemTab(QWidget *parent) : QWidget(parent) {
@@ -15,18 +16,16 @@ LinearSystemTab::LinearSystemTab(QWidget *parent) : QWidget(parent) {
     auto *matrixLayout = new QGridLayout;
     answerField = new QTextEdit();
     answerField->setPlainText(tr("--- ANSWER ---"));
+    answerField->setAlignment(Qt::AlignCenter);
     answerField->setMinimumWidth(400);
     //task
     doubleValidator = new QDoubleValidator;
     doubleValidator->setNotation(QDoubleValidator::ScientificNotation);
-    aCells = new QGridLayout;
-    bCells = new QGridLayout;
-    setAMatrix(aCells);
-    setBMatrix(bCells);
+    cellsLayout = new QGridLayout;
+    setAMatrix(cellsLayout);
 
     matrixLayout->addWidget(answerField, 0, 2);
-    matrixLayout->addLayout(aCells, 0, 0);
-    matrixLayout->addLayout(bCells, 0, 1);
+    matrixLayout->addLayout(cellsLayout, 0, 0);
     gridGroupBox->setLayout(matrixLayout);
 
     // FILT
@@ -93,9 +92,9 @@ void LinearSystemTab::solve() {
     auto **A = new long double *[n], *B = new long double[n];
     for (int i = 0; i < n; i++) A[i] = new long double[n];
     for (auto i = 0; i < n; i++) {
-        B[i] = matrixB[i]->text().replace(",", ".").toDouble();
+        B[i] = matrix[i][n + 1]->text().replace(",", ".").toDouble();
         for (auto j = 0; j < n; j++) {
-            A[i][j] = matrixA[i][j]->text().replace(",", ".").toDouble();
+            A[i][j] = matrix[i][j]->text().replace(",", ".").toDouble();
         }
     }
     compute(A, B, n, e);
@@ -103,63 +102,78 @@ void LinearSystemTab::solve() {
 
 void LinearSystemTab::takeFromFile() {
     int n = numberSlider->value();
-    QFile
-            taskFile("linear_sys_task.txt");
-    if (taskFile.exists()) {
-        taskFile.open(QIODevice::ReadOnly);
-        int j = -1;
-        QString
-                cell;
-                foreach(QString
-                                s, QString(taskFile.readAll()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts)) {
-                j++;
-                cell = s.section(" ", n, n).replace(",", ".");
-                cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
-                matrixB[j]->setText(cell);
-                for (int i = 0; i < n; i++) {
-                    cell = s.section(" ", i, i).replace(",", ".");
-                    cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
-                    matrixA[j][i]->setText(cell);
+    QString file = QFileDialog::getOpenFileName(this, "ВЫБЕРИТЕ ФАЙЛ", "");
+    if (file != nullptr) {
+        QFile
+                taskFile(file);
+        if (taskFile.exists()) {
+            try {taskFile.open(QIODevice::ReadOnly);
+            // clear matrix
+            for (int i = 0; i < n; i++){
+                matrix[i][n + 1]->setText("0");
+                for (int j = 0; j < n; j++){
+                    matrix[j][i]->setText("0");
                 }
             }
-        taskFile.close();
-    } else {
-        QMessageBox
-                fileNotfoundMsg;
-        fileNotfoundMsg.setText("Сорян, файл не найден");
-        fileNotfoundMsg.exec();
+            int j = -1;
+            QString
+                    cell;
+                    foreach(QString
+                                    s, QString(taskFile.readAll()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts)) {
+                    j++;
+                    if (j == n) break;
+                    cell = s.section(" ", n, n).replace(",", ".");
+                    cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
+                    matrix[j][n + 1]->setText(cell);
+                    for (int i = 0; i < n; i++) {
+                        cell = s.section(" ", i, i).replace(",", ".");
+                        cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
+                        matrix[j][i]->setText(cell);
+                    }
+                }
+            taskFile.close();
+            }catch (QFile::FileError & e) {
+                QMessageBox
+                        readExcMsg;
+                readExcMsg.setText("Ошибка во время чтения файла \n ");
+                readExcMsg.exec();
+            }
+        } else {
+            QMessageBox
+                    fileNotfoundMsg;
+            fileNotfoundMsg.setText("Сорян, файл не найден");
+            fileNotfoundMsg.exec();
+        }
     }
 }
 
 void LinearSystemTab::reset() {
     int n = numberSlider->value();
     for (auto i = 0; i < n; i++) {
-        matrixB[i]->setText("0");
-        for (auto j = 0; j < n; j++) {
-            matrixA[i][j]->setText("0");
+        for (auto j = 0; j < n + 2; j++) {
+            if (j != n) matrix[i][j]->setText("0");
         }
     }
 }
 
 void LinearSystemTab::setRandom() {
     int n = numberSlider->value();
-    QString
-            cell;
+    QString cell;
     for (auto i = 0; i < n; i++) {
         double x = randomDouble(-100, 100);
         cell = QString::number(x == 0 ? 42 : x, 'g', 4).replace(",", ".");
-        matrixA[i][i]->setText(cell);
+        matrix[i][i]->setText(cell);
         cell = QString::number(x + randomDouble(-70, 70), 'g', 4).replace(",", ".");
-        matrixB[i]->setText(cell);
+        matrix[i][n + 1]->setText(cell);
     }
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             if (i != j) {
-                double negBound = matrixA[i][i]->text().toDouble();
+                double negBound = matrix[i][i]->text().toDouble();
                 negBound = negBound < 0 ? negBound : negBound * (-1);
                 double x = randomDouble(negBound, negBound * (-1));
                 cell = QLocale().toString(x / n, 'g', 4).replace(",", ".");
-                matrixA[i][j]->setText(cell);
+                matrix[i][j]->setText(cell);
             }
         }
     }
@@ -185,30 +199,22 @@ void LinearSystemTab::setSlider() {
 
 void LinearSystemTab::setAMatrix(QGridLayout *aCells) {
     for (auto i = 0; i < MAX_N; i++) {
-        matrixB[i] = createCell("0");
-        equalitySigns[i] = createCell("   =");
         for (auto j = 0; j < MAX_N; j++) {
-            matrixA[i][j] = createCell("0");
-            aCells->addWidget(matrixA[i][j], i, j);
+            matrix[i][j] = createCell("0");
+            aCells->addWidget(matrix[i][j], i, j);
         }
     }
+    // set = and b
     for (int i = 0; i < MAX_N; i++) {
-        matrixA[i][equalityColomn] = equalitySigns[i];
-        matrixA[i][matrixBColomn] = matrixB[i];
-        aCells->addWidget(equalitySigns[i], i, equalityColomn);
-        aCells->addWidget(matrixB[i], i, matrixBColomn);
+        matrix[i][equalityColomn] = createCell("=");
+        matrix[i][matrixBColomn] = createCell("0");
+        aCells->addWidget(matrix[i][equalityColomn], i, equalityColomn);
+        aCells->addWidget(matrix[i][matrixBColomn], i, matrixBColomn);
     }
-}
-
-void LinearSystemTab::setBMatrix(QGridLayout *bCells) {
-    /*for (auto i = 0; i < MAX_N; i++) {
-        matrixB[i] = createCell("0");
-        bCells->addWidget(matrixB[i], i, 1);
-    }*/
 }
 
 QLineEdit *LinearSystemTab::createCell(QString text) {
-    aCells->setColumnStretch(MAX_N, 1);
+    cellsLayout->setColumnStretch(MAX_N, 1);
     auto *aCell = new QLineEdit();
     aCell->setText(text);
     aCell->setValidator(doubleValidator);
@@ -217,7 +223,7 @@ QLineEdit *LinearSystemTab::createCell(QString text) {
     aCell->setFrame(false);
     aCell->setEnabled(false);
     aCell->setStyleSheet("* { background-color: rgba(0, 0, 0, 0); color: black;}");
-    if (text != "   =") {
+    if (text != "=") {
         aCell->setFrame(true);
         aCell->setEnabled(true);
         aCell->setStyleSheet("* { background-color: white; color: black;}");
@@ -234,69 +240,69 @@ void LinearSystemTab::changeNumber(int newN) {
         int step = newN - currN;
         // move b and "="
         for (int i = 0; i < newN; i++) {
-            matrixA[i][matrixBColomn + step]->setFrame(true);
-            matrixA[i][matrixBColomn + step]->setEnabled(true);
-            matrixA[i][matrixBColomn + step]->setStyleSheet("* { background-color: white; color: black;}");
-            matrixA[i][matrixBColomn + step]->setMaximumSize(50, 15);
-            if (i >= currN) matrixA[i][matrixBColomn + step]->setText("0");
-            else matrixA[i][matrixBColomn + step]->setText(matrixA[i][matrixBColomn]->text());
+            matrix[i][matrixBColomn + step]->setFrame(true);
+            matrix[i][matrixBColomn + step]->setEnabled(true);
+            matrix[i][matrixBColomn + step]->setStyleSheet("* { background-color: white; color: black;}");
+            matrix[i][matrixBColomn + step]->setMaximumSize(50, 15);
+            if (i >= currN) matrix[i][matrixBColomn + step]->setText("0");
+            else matrix[i][matrixBColomn + step]->setText(matrix[i][matrixBColomn]->text());
 
-            matrixA[i][equalityColomn + step]->setText("=");
-            matrixA[i][equalityColomn + step]->setMaximumSize(10, 15);
-            matrixA[i][equalityColomn + step]->setFrame(false);
-            matrixA[i][equalityColomn + step]->setEnabled(false);
-            matrixA[i][equalityColomn + step]->setStyleSheet("* { background-color: rgba(0, 0, 0, 0); color: black;}");
+            matrix[i][equalityColomn + step]->setText("=");
+            matrix[i][equalityColomn + step]->setMaximumSize(10, 15);
+            matrix[i][equalityColomn + step]->setFrame(false);
+            matrix[i][equalityColomn + step]->setEnabled(false);
+            matrix[i][equalityColomn + step]->setStyleSheet("* { background-color: rgba(0, 0, 0, 0); color: black;}");
         }
         // set new cells
         for (int i = 0; i < newN; i++) {
             for (int j = currN; j < newN; j++) {
-                matrixA[j][i]->setFrame(true);
-                matrixA[j][i]->setEnabled(true);
-                matrixA[j][i]->setStyleSheet("* { background-color: white; color: black;}");
-                matrixA[j][i]->setMaximumSize(50, 15);
-                matrixA[j][i]->setText("0");
+                matrix[j][i]->setFrame(true);
+                matrix[j][i]->setEnabled(true);
+                matrix[j][i]->setStyleSheet("* { background-color: white; color: black;}");
+                matrix[j][i]->setMaximumSize(50, 15);
+                matrix[j][i]->setText("0");
 
-                matrixA[i][j]->setFrame(true);
-                matrixA[i][j]->setEnabled(true);
-                matrixA[i][j]->setStyleSheet("* { background-color: white; color: black;}");
-                matrixA[i][j]->setMaximumSize(50, 15);
-                matrixA[i][j]->setText("0");
+                matrix[i][j]->setFrame(true);
+                matrix[i][j]->setEnabled(true);
+                matrix[i][j]->setStyleSheet("* { background-color: white; color: black;}");
+                matrix[i][j]->setMaximumSize(50, 15);
+                matrix[i][j]->setText("0");
             }
         }
-        equalityColomn+=step;
-        matrixBColomn+=step;
+        equalityColomn += step;
+        matrixBColomn += step;
 
     } else if (newN < currN) {
         int step = currN - newN;
         // set "=" and b to new place
         for (int i = 0; i < newN; i++) {
-            matrixA[i][matrixBColomn - step]->setFrame(true);
-            matrixA[i][matrixBColomn - step]->setEnabled(true);
-            matrixA[i][matrixBColomn - step]->setStyleSheet("* { background-color: white; color: black;}");
-            matrixA[i][matrixBColomn - step]->setMaximumSize(50, 15);
-            matrixA[i][matrixBColomn - step]->setText(matrixA[i][matrixBColomn]->text());
+            matrix[i][matrixBColomn - step]->setFrame(true);
+            matrix[i][matrixBColomn - step]->setEnabled(true);
+            matrix[i][matrixBColomn - step]->setStyleSheet("* { background-color: white; color: black;}");
+            matrix[i][matrixBColomn - step]->setMaximumSize(50, 15);
+            matrix[i][matrixBColomn - step]->setText(matrix[i][matrixBColomn]->text());
 
-            matrixA[i][equalityColomn - step]->setText("=");
-            matrixA[i][equalityColomn - step]->setMaximumSize(10, 15);
-            matrixA[i][equalityColomn - step]->setFrame(false);
-            matrixA[i][equalityColomn - step]->setEnabled(false);
-            matrixA[i][equalityColomn - step]->setStyleSheet("* { background-color: rgba(0, 0, 0, 0); color: black;}");
+            matrix[i][equalityColomn - step]->setText("=");
+            matrix[i][equalityColomn - step]->setMaximumSize(10, 15);
+            matrix[i][equalityColomn - step]->setFrame(false);
+            matrix[i][equalityColomn - step]->setEnabled(false);
+            matrix[i][equalityColomn - step]->setStyleSheet("* { background-color: rgba(0, 0, 0, 0); color: black;}");
         }
 
         // set size 0 to others
         for (int i = matrixBColomn; i < MAX_N + 2; i++) {
             for (int j = 0; j < MAX_N; j++) {
-                //matrixA[j][i] = createCell("0");
-                matrixA[j][i]->setMaximumSize(0, 0);
+                //matrix[j][i] = createCell("0");
+                matrix[j][i]->setMaximumSize(0, 0);
             }
         }
         for (int i = newN; i < MAX_N; i++) {
             for (int j = 0; j < MAX_N; j++) {
-                //matrixA[j][i] = createCell("0");
-                matrixA[i][j]->setMaximumSize(0, 0);
+                //matrix[j][i] = createCell("0");
+                matrix[i][j]->setMaximumSize(0, 0);
             }
         }
-        matrixA[19][20]->setMaximumSize(0, 0); // ОСТОРОЖНО, костыль! не трогать
+        matrix[19][20]->setMaximumSize(0, 0); // ОСТОРОЖНО, костыль! не трогать
         equalityColomn = newN;
         matrixBColomn = newN + 1;
     }
@@ -306,8 +312,6 @@ void LinearSystemTab::changeNumber(int newN) {
 }
 
 /*
- * выбор файла
- * удаление лишних
  * точна/запятая
  * nan - система не решается методом гаусса
  * */

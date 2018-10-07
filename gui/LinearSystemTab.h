@@ -35,12 +35,10 @@ private:
     static const int MAX_N = 20;
     int matrixBColomn = MAX_N + 1;
     int equalityColomn = MAX_N;
-    QLineEdit *matrixA[MAX_N][MAX_N + 2];
-    QLineEdit *matrixB[MAX_N];
-    QLineEdit *equalitySigns[MAX_N];
+    QLineEdit *matrix[MAX_N][MAX_N + 2];
     QDoubleValidator *doubleValidator;
     QGroupBox *gridGroupBox, *filtGroupBox, *buttonsGroupBox;
-    QGridLayout *aCells, *bCells;
+    QGridLayout *cellsLayout;
     QTextEdit *answerField;
     QLineEdit *precisionField;
     QSlider *numberSlider;
@@ -50,8 +48,6 @@ private:
     void setSlider();
 
     void setAMatrix(QGridLayout *aCells);
-
-    void setBMatrix(QGridLayout *bCells);
 
     QLineEdit *createCell(QString text);
 
