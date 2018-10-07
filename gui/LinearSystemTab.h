@@ -1,5 +1,6 @@
 #ifndef COMPMATH_LINEARSYSTEMTAB_H
 #define COMPMATH_LINEARSYSTEMTAB_H
+
 #include <QDialog>
 #include <QtWidgets/QShortcut>
 #include <QtWidgets/QGroupBox>
@@ -13,23 +14,30 @@
 
 
 class LinearSystemTab : public QWidget {
-    Q_OBJECT
+Q_OBJECT
 public:
     explicit LinearSystemTab(QWidget *parent = nullptr);
 
 private slots:
+
     void changeNumber(int newN);
+
     void reset();
+
     void setRandom();
+
     void takeFromFile();
+
     void solve();
 
 private:
     int currN;
     static const int MAX_N = 20;
-    QLineEdit *matrixA[MAX_N][MAX_N];
+    int matrixBColomn = MAX_N + 1;
+    int equalityColomn = MAX_N;
+    QLineEdit *matrixA[MAX_N][MAX_N + 2];
     QLineEdit *matrixB[MAX_N];
-    QLabel *equalitySigns[MAX_N];
+    QLineEdit *equalitySigns[MAX_N];
     QDoubleValidator *doubleValidator;
     QGroupBox *gridGroupBox, *filtGroupBox, *buttonsGroupBox;
     QGridLayout *aCells, *bCells;
@@ -40,10 +48,15 @@ private:
     QPushButton *randButton, *fileButton, *solveButton, *resetButton;
 
     void setSlider();
+
     void setAMatrix(QGridLayout *aCells);
+
     void setBMatrix(QGridLayout *bCells);
-    QLineEdit* createCell(QString text);
+
+    QLineEdit *createCell(QString text);
+
     void setButtons();
+
     double randomDouble(double lower, double upper);
 };
 

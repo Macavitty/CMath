@@ -104,28 +104,28 @@ void LinearSystemTab::solve() {
 void LinearSystemTab::takeFromFile() {
     int n = numberSlider->value();
     QFile
-    taskFile("linear_sys_task.txt");
+            taskFile("linear_sys_task.txt");
     if (taskFile.exists()) {
         taskFile.open(QIODevice::ReadOnly);
         int j = -1;
         QString
-        cell;
-        foreach(QString
-        s, QString(taskFile.readAll()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts)) {
-            j++;
-            cell = s.section(" ", n, n).replace(",", ".");
-            cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
-            matrixB[j]->setText(cell);
-            for (int i = 0; i < n; i++) {
-                cell = s.section(" ", i, i).replace(",", ".");
+                cell;
+                foreach(QString
+                                s, QString(taskFile.readAll()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts)) {
+                j++;
+                cell = s.section(" ", n, n).replace(",", ".");
                 cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
-                matrixA[j][i]->setText(cell);
+                matrixB[j]->setText(cell);
+                for (int i = 0; i < n; i++) {
+                    cell = s.section(" ", i, i).replace(",", ".");
+                    cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
+                    matrixA[j][i]->setText(cell);
+                }
             }
-        }
         taskFile.close();
     } else {
         QMessageBox
-        fileNotfoundMsg;
+                fileNotfoundMsg;
         fileNotfoundMsg.setText("Сорян, файл не найден");
         fileNotfoundMsg.exec();
     }
@@ -144,7 +144,7 @@ void LinearSystemTab::reset() {
 void LinearSystemTab::setRandom() {
     int n = numberSlider->value();
     QString
-    cell;
+            cell;
     for (auto i = 0; i < n; i++) {
         double x = randomDouble(-100, 100);
         cell = QString::number(x == 0 ? 42 : x, 'g', 4).replace(",", ".");
@@ -177,63 +177,131 @@ void LinearSystemTab::setSlider() {
     numberSlider->setMinimum(1);
     numberSlider->setValue(20);
     numberSlider->setSingleStep(1);
+    numberSlider->setTickInterval(10);
     numberLabel = new QLabel;
     numberLabel->setText("20");
     connect(numberSlider, SIGNAL(valueChanged(int)), this, SLOT(changeNumber(int)));
 }
 
-void LinearSystemTab::setAMatrix(QGridLayout * aCells) {
-    //aCells->setRowStretch(MAX_N, 1);
-   // bCells->setColumnStretch(MAX_N, 1);
+void LinearSystemTab::setAMatrix(QGridLayout *aCells) {
     for (auto i = 0; i < MAX_N; i++) {
-        equalitySigns[i] = new QLabel(tr(" = "));
-        aCells->addWidget(equalitySigns[i], i, MAX_N);
+        matrixB[i] = createCell("0");
+        equalitySigns[i] = createCell("   =");
         for (auto j = 0; j < MAX_N; j++) {
             matrixA[i][j] = createCell("0");
             aCells->addWidget(matrixA[i][j], i, j);
         }
     }
-}
-
-void LinearSystemTab::setBMatrix(QGridLayout * bCells) {
-    for (auto i = 0; i < MAX_N; i++) {
-        matrixB[i] = createCell("0");
-        bCells->addWidget(matrixB[i], i, 1);
+    for (int i = 0; i < MAX_N; i++) {
+        matrixA[i][equalityColomn] = equalitySigns[i];
+        matrixA[i][matrixBColomn] = matrixB[i];
+        aCells->addWidget(equalitySigns[i], i, equalityColomn);
+        aCells->addWidget(matrixB[i], i, matrixBColomn);
     }
 }
 
+void LinearSystemTab::setBMatrix(QGridLayout *bCells) {
+    /*for (auto i = 0; i < MAX_N; i++) {
+        matrixB[i] = createCell("0");
+        bCells->addWidget(matrixB[i], i, 1);
+    }*/
+}
+
 QLineEdit *LinearSystemTab::createCell(QString text) {
+    aCells->setColumnStretch(MAX_N, 1);
     auto *aCell = new QLineEdit();
     aCell->setText(text);
     aCell->setValidator(doubleValidator);
-    aCell->setMaximumSize(50, 15);
     aCell->setMaxLength(20);
+    aCell->setMaximumSize(10, 15);
+    aCell->setFrame(false);
+    aCell->setEnabled(false);
+    aCell->setStyleSheet("* { background-color: rgba(0, 0, 0, 0); color: black;}");
+    if (text != "   =") {
+        aCell->setFrame(true);
+        aCell->setEnabled(true);
+        aCell->setStyleSheet("* { background-color: white; color: black;}");
+        aCell->setMaximumSize(50, 15);
+    }
+
     return aCell;
 }
 
 void LinearSystemTab::changeNumber(int newN) {
     numberLabel->setText(QString::fromStdString(std::to_string(newN)));
+    numberSlider->setEnabled(false);
     if (newN > currN) {
-        for (auto i = currN; i < newN; i++) {
-            matrixB[i]->setMaximumSize(50, 15);
-            for (auto j = 0; j < newN; j++) {
-                matrixA[i][j]->setMaximumSize(50, 15);
+        int step = newN - currN;
+        // move b and "="
+        for (int i = 0; i < newN; i++) {
+            matrixA[i][matrixBColomn + step]->setFrame(true);
+            matrixA[i][matrixBColomn + step]->setEnabled(true);
+            matrixA[i][matrixBColomn + step]->setStyleSheet("* { background-color: white; color: black;}");
+            matrixA[i][matrixBColomn + step]->setMaximumSize(50, 15);
+            if (i >= currN) matrixA[i][matrixBColomn + step]->setText("0");
+            else matrixA[i][matrixBColomn + step]->setText(matrixA[i][matrixBColomn]->text());
+
+            matrixA[i][equalityColomn + step]->setText("=");
+            matrixA[i][equalityColomn + step]->setMaximumSize(10, 15);
+            matrixA[i][equalityColomn + step]->setFrame(false);
+            matrixA[i][equalityColomn + step]->setEnabled(false);
+            matrixA[i][equalityColomn + step]->setStyleSheet("* { background-color: rgba(0, 0, 0, 0); color: black;}");
+        }
+        // set new cells
+        for (int i = 0; i < newN; i++) {
+            for (int j = currN; j < newN; j++) {
+                matrixA[j][i]->setFrame(true);
+                matrixA[j][i]->setEnabled(true);
+                matrixA[j][i]->setStyleSheet("* { background-color: white; color: black;}");
                 matrixA[j][i]->setMaximumSize(50, 15);
+                matrixA[j][i]->setText("0");
+
+                matrixA[i][j]->setFrame(true);
+                matrixA[i][j]->setEnabled(true);
+                matrixA[i][j]->setStyleSheet("* { background-color: white; color: black;}");
+                matrixA[i][j]->setMaximumSize(50, 15);
+                matrixA[i][j]->setText("0");
             }
         }
+        equalityColomn+=step;
+        matrixBColomn+=step;
+
     } else if (newN < currN) {
-        for (auto i = newN; i < currN; i++) {
-            //delete(matrixB[i]);
-            matrixB[i]->setMaximumSize(0, 0);
-            equalitySigns[i]->setMaximumSize(0, 0);
-            //delete(equalitySigns[i]);
-            for (auto j = 0; j < currN; j++) {
-                matrixA[i][j]->setMaximumSize(0, 0);
+        int step = currN - newN;
+        // set "=" and b to new place
+        for (int i = 0; i < newN; i++) {
+            matrixA[i][matrixBColomn - step]->setFrame(true);
+            matrixA[i][matrixBColomn - step]->setEnabled(true);
+            matrixA[i][matrixBColomn - step]->setStyleSheet("* { background-color: white; color: black;}");
+            matrixA[i][matrixBColomn - step]->setMaximumSize(50, 15);
+            matrixA[i][matrixBColomn - step]->setText(matrixA[i][matrixBColomn]->text());
+
+            matrixA[i][equalityColomn - step]->setText("=");
+            matrixA[i][equalityColomn - step]->setMaximumSize(10, 15);
+            matrixA[i][equalityColomn - step]->setFrame(false);
+            matrixA[i][equalityColomn - step]->setEnabled(false);
+            matrixA[i][equalityColomn - step]->setStyleSheet("* { background-color: rgba(0, 0, 0, 0); color: black;}");
+        }
+
+        // set size 0 to others
+        for (int i = matrixBColomn; i < MAX_N + 2; i++) {
+            for (int j = 0; j < MAX_N; j++) {
+                //matrixA[j][i] = createCell("0");
                 matrixA[j][i]->setMaximumSize(0, 0);
             }
         }
+        for (int i = newN; i < MAX_N; i++) {
+            for (int j = 0; j < MAX_N; j++) {
+                //matrixA[j][i] = createCell("0");
+                matrixA[i][j]->setMaximumSize(0, 0);
+            }
+        }
+        matrixA[19][20]->setMaximumSize(0, 0); // ОСТОРОЖНО, костыль! не трогать
+        equalityColomn = newN;
+        matrixBColomn = newN + 1;
     }
     currN = newN;
+    numberSlider->setEnabled(true);
 
 }
 
