@@ -19,8 +19,8 @@ LinearSystemTab::LinearSystemTab(QWidget *parent) : QWidget(parent) {
     //task
     doubleValidator = new QDoubleValidator;
     doubleValidator->setNotation(QDoubleValidator::ScientificNotation);
-    auto *aCells = new QGridLayout;
-    auto *bCells = new QGridLayout;
+    aCells = new QGridLayout;
+    bCells = new QGridLayout;
     setAMatrix(aCells);
     setBMatrix(bCells);
 
@@ -33,6 +33,7 @@ LinearSystemTab::LinearSystemTab(QWidget *parent) : QWidget(parent) {
     filtGroupBox = new QGroupBox(tr(""));
     auto *filtLayout = new QFormLayout;
     setSlider();
+    currN = MAX_N;
     filtLayout->addRow(new QLabel(tr("Число неизвестных:")), numberLabel);
     filtLayout->addRow(new QLabel(tr("")), numberSlider);
     precisionField = new QLineEdit;
@@ -177,51 +178,68 @@ void LinearSystemTab::setSlider() {
 }
 
 void LinearSystemTab::setAMatrix(QGridLayout *aCells) {
-    for (auto i = 0; i < 20; i++) {
-        for (auto j = 0; j < 20; j++) {
-            auto aCell = new QLineEdit();
-            aCell->setText("0");
-            aCell->setValidator(new QDoubleValidator);
-            aCell->setMaximumSize(50, 15);
-            aCell->setMaxLength(20);
-            aCells->addWidget(aCell, i, j);
-            matrixA[i][j] = aCell;
+    aCells->setRowStretch(MAX_N, 20);
+    for (auto i = 0; i < MAX_N; i++) {
+        for (auto j = 0; j < MAX_N; j++) {
+            matrixA[i][j] = createCell("0");
+            aCells->addWidget(matrixA[i][j], i, j);
         }
     }
 }
 
 void LinearSystemTab::setBMatrix(QGridLayout *bCells) {
+    bCells->setRowStretch(MAX_N, 1);
     bCells->setColumnStretch(2, 1);
-    for (auto i = 0; i < 20; i++) {
-        auto bCell = new QLineEdit();
-        bCell->setText("0");
-        bCell->setValidator(new QDoubleValidator);
-        bCell->setMaximumSize(50, 15);
-        bCell->setMaxLength(20);
-        bCells->addWidget(new QLabel(tr(" = ")), i, 0);
-        bCells->addWidget(bCell, i, 1);
-        matrixB[i] = bCell;
+    for (auto i = 0; i < MAX_N; i++) {
+        equalitySigns[i] = new QLabel(tr(" = "));
+        bCells->addWidget(equalitySigns[i], i, 0);
+        matrixB[i] = createCell("0");
+        bCells->addWidget(matrixB[i], i, 1);
     }
 }
 
-void LinearSystemTab::changeNumber(int value) {
-    numberLabel->setText(QString::fromStdString(std::to_string(value)));
-    for (auto i = value; i < 20; i++) {
-        //matrixB[i]->setText("0");
-        matrixB[i]->setEnabled(false);
-        for (auto j = 0; j < 20; j++) {
-            //matrixA[i][j]->setText("0");
-            matrixA[i][j]->setEnabled(false);
-            //matrixA[j][i]->setText("0");
-            matrixA[j][i]->setEnabled(false);
+QLineEdit * LinearSystemTab::createCell(QString text){
+    auto *aCell = new QLineEdit();
+    aCell->setText(text);
+    aCell->setValidator(doubleValidator);
+    aCell->setMaximumSize(50, 15);
+    aCell->setMaxLength(20);
+    return aCell;
+}
+
+void LinearSystemTab::changeNumber(int newN) {
+    numberLabel->setText(QString::fromStdString(std::to_string(newN)));
+    if (newN > currN){
+        for (auto i = currN; i < newN; i++){
+            equalitySigns[i] = new QLabel(tr(" = "));
+            bCells->addWidget(equalitySigns[i], i, 0);
+            matrixB[i] = createCell("0");
+            bCells->addWidget(matrixB[i], i, 1);
+            for (auto j = 0; j < newN; j++){
+                matrixA[i][j] = createCell("0");
+                matrixA[j][i] = createCell("0");
+                aCells->addWidget(matrixA[i][j], i, j);
+                aCells->addWidget(matrixA[j][i], j, i);
+            }
         }
     }
-    for (auto i = 0; i < value; i++) {
-        matrixB[i]->setEnabled(true);
-        for (auto j = 0; j < value; j++) {
-            matrixA[i][j]->setEnabled(true);
+    else if (newN < currN){
+        for (auto i = newN; i < currN; i++){
+            if (matrixB[i] != nullptr) delete(matrixB[i]);
+            if (equalitySigns[i] != nullptr) delete(equalitySigns[i]);
+            for (auto j = 0; j < currN; j++){
+                if (matrixA[i][j] != nullptr) delete(matrixA[i][j]);
+                if (i != j && matrixA[j][i] != nullptr) delete(matrixA[j][i]);
+            }
         }
     }
+    currN = newN;
+   /* for (int i = 0; i < 20; i++){
+        for (int j = 0; j < 20; j++){
+            if (!aCells->isEmpty()) {delete(matrixA[i][j]);}
+        }
+    }*/
+
 }
 
 /*

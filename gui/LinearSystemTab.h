@@ -18,17 +18,21 @@ public:
     explicit LinearSystemTab(QWidget *parent = nullptr);
 
 private slots:
-    void changeNumber(int value);
+    void changeNumber(int newN);
     void reset();
     void setRandom();
     void takeFromFile();
     void solve();
 
 private:
-    QLineEdit *matrixA[20][20];
-    QLineEdit *matrixB[20];
+    int currN;
+    static const int MAX_N = 20;
+    QLineEdit *matrixA[MAX_N][MAX_N];
+    QLineEdit *matrixB[MAX_N];
+    QLabel *equalitySigns[MAX_N];
     QDoubleValidator *doubleValidator;
     QGroupBox *gridGroupBox, *filtGroupBox, *buttonsGroupBox;
+    QGridLayout *aCells, *bCells;
     QTextEdit *answerField;
     QLineEdit *precisionField;
     QSlider *numberSlider;
@@ -38,6 +42,7 @@ private:
     void setSlider();
     void setAMatrix(QGridLayout *aCells);
     void setBMatrix(QGridLayout *bCells);
+    QLineEdit* createCell(QString text);
     void setButtons();
     double randomDouble(double lower, double upper);
 };
