@@ -15,7 +15,7 @@ LinearSystemTab::LinearSystemTab(QWidget *parent) : QWidget(parent) {
     auto *matrixLayout = new QGridLayout;
     answerField = new QTextEdit();
     answerField->setPlainText(tr("--- ANSWER ---"));
-    answerField->setFixedWidth(400);
+    answerField->setMinimumWidth(400);
     //task
     doubleValidator = new QDoubleValidator;
     doubleValidator->setNotation(QDoubleValidator::ScientificNotation);
@@ -90,11 +90,11 @@ void LinearSystemTab::setButtons() {
 void LinearSystemTab::solve() {
     int n = numberSlider->value();
     double e = precisionField->text().replace(",", ".").toDouble();
-    auto **A = new long double*[n], *B = new long double[n];
-    for (int i = 0 ; i <n ; i++) A[i] = new long double[n];
-   for (auto i = 0; i < n; i++){
+    auto **A = new long double *[n], *B = new long double[n];
+    for (int i = 0; i < n; i++) A[i] = new long double[n];
+    for (auto i = 0; i < n; i++) {
         B[i] = matrixB[i]->text().replace(",", ".").toDouble();
-        for (auto j = 0; j < n; j++){
+        for (auto j = 0; j < n; j++) {
             A[i][j] = matrixA[i][j]->text().replace(",", ".").toDouble();
         }
     }
@@ -103,25 +103,29 @@ void LinearSystemTab::solve() {
 
 void LinearSystemTab::takeFromFile() {
     int n = numberSlider->value();
-    QFile taskFile("linear_sys_task.txt");
+    QFile
+    taskFile("linear_sys_task.txt");
     if (taskFile.exists()) {
         taskFile.open(QIODevice::ReadOnly);
         int j = -1;
-        QString cell;
-                foreach (QString s, QString(taskFile.readAll()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts)) {
-                j++;
-                cell = s.section(" ", n, n).replace(",", ".");
+        QString
+        cell;
+        foreach(QString
+        s, QString(taskFile.readAll()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts)) {
+            j++;
+            cell = s.section(" ", n, n).replace(",", ".");
+            cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
+            matrixB[j]->setText(cell);
+            for (int i = 0; i < n; i++) {
+                cell = s.section(" ", i, i).replace(",", ".");
                 cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
-                matrixB[j]->setText(cell);
-                for (int i = 0; i < n; i++) {
-                    cell = s.section(" ", i, i).replace(",", ".");
-                    cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
-                    matrixA[j][i]->setText(cell);
-                }
+                matrixA[j][i]->setText(cell);
             }
+        }
         taskFile.close();
     } else {
-        QMessageBox fileNotfoundMsg;
+        QMessageBox
+        fileNotfoundMsg;
         fileNotfoundMsg.setText("Сорян, файл не найден");
         fileNotfoundMsg.exec();
     }
@@ -139,7 +143,8 @@ void LinearSystemTab::reset() {
 
 void LinearSystemTab::setRandom() {
     int n = numberSlider->value();
-    QString cell;
+    QString
+    cell;
     for (auto i = 0; i < n; i++) {
         double x = randomDouble(-100, 100);
         cell = QString::number(x == 0 ? 42 : x, 'g', 4).replace(",", ".");
@@ -177,9 +182,12 @@ void LinearSystemTab::setSlider() {
     connect(numberSlider, SIGNAL(valueChanged(int)), this, SLOT(changeNumber(int)));
 }
 
-void LinearSystemTab::setAMatrix(QGridLayout *aCells) {
-    aCells->setRowStretch(MAX_N, 20);
+void LinearSystemTab::setAMatrix(QGridLayout * aCells) {
+    //aCells->setRowStretch(MAX_N, 1);
+   // bCells->setColumnStretch(MAX_N, 1);
     for (auto i = 0; i < MAX_N; i++) {
+        equalitySigns[i] = new QLabel(tr(" = "));
+        aCells->addWidget(equalitySigns[i], i, MAX_N);
         for (auto j = 0; j < MAX_N; j++) {
             matrixA[i][j] = createCell("0");
             aCells->addWidget(matrixA[i][j], i, j);
@@ -187,18 +195,14 @@ void LinearSystemTab::setAMatrix(QGridLayout *aCells) {
     }
 }
 
-void LinearSystemTab::setBMatrix(QGridLayout *bCells) {
-    bCells->setRowStretch(MAX_N, 1);
-    bCells->setColumnStretch(2, 1);
+void LinearSystemTab::setBMatrix(QGridLayout * bCells) {
     for (auto i = 0; i < MAX_N; i++) {
-        equalitySigns[i] = new QLabel(tr(" = "));
-        bCells->addWidget(equalitySigns[i], i, 0);
         matrixB[i] = createCell("0");
         bCells->addWidget(matrixB[i], i, 1);
     }
 }
 
-QLineEdit * LinearSystemTab::createCell(QString text){
+QLineEdit *LinearSystemTab::createCell(QString text) {
     auto *aCell = new QLineEdit();
     aCell->setText(text);
     aCell->setValidator(doubleValidator);
@@ -209,36 +213,27 @@ QLineEdit * LinearSystemTab::createCell(QString text){
 
 void LinearSystemTab::changeNumber(int newN) {
     numberLabel->setText(QString::fromStdString(std::to_string(newN)));
-    if (newN > currN){
-        for (auto i = currN; i < newN; i++){
-            equalitySigns[i] = new QLabel(tr(" = "));
-            bCells->addWidget(equalitySigns[i], i, 0);
-            matrixB[i] = createCell("0");
-            bCells->addWidget(matrixB[i], i, 1);
-            for (auto j = 0; j < newN; j++){
-                matrixA[i][j] = createCell("0");
-                matrixA[j][i] = createCell("0");
-                aCells->addWidget(matrixA[i][j], i, j);
-                aCells->addWidget(matrixA[j][i], j, i);
+    if (newN > currN) {
+        for (auto i = currN; i < newN; i++) {
+            matrixB[i]->setMaximumSize(50, 15);
+            for (auto j = 0; j < newN; j++) {
+                matrixA[i][j]->setMaximumSize(50, 15);
+                matrixA[j][i]->setMaximumSize(50, 15);
             }
         }
-    }
-    else if (newN < currN){
-        for (auto i = newN; i < currN; i++){
-            if (matrixB[i] != nullptr) delete(matrixB[i]);
-            if (equalitySigns[i] != nullptr) delete(equalitySigns[i]);
-            for (auto j = 0; j < currN; j++){
-                if (matrixA[i][j] != nullptr) delete(matrixA[i][j]);
-                if (i != j && matrixA[j][i] != nullptr) delete(matrixA[j][i]);
+    } else if (newN < currN) {
+        for (auto i = newN; i < currN; i++) {
+            //delete(matrixB[i]);
+            matrixB[i]->setMaximumSize(0, 0);
+            equalitySigns[i]->setMaximumSize(0, 0);
+            //delete(equalitySigns[i]);
+            for (auto j = 0; j < currN; j++) {
+                matrixA[i][j]->setMaximumSize(0, 0);
+                matrixA[j][i]->setMaximumSize(0, 0);
             }
         }
     }
     currN = newN;
-   /* for (int i = 0; i < 20; i++){
-        for (int j = 0; j < 20; j++){
-            if (!aCells->isEmpty()) {delete(matrixA[i][j]);}
-        }
-    }*/
 
 }
 
