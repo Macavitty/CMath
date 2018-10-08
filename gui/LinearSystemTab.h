@@ -10,6 +10,7 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QLabel>
 #include <QDoubleValidator>
+#include <math.h>
 #include "algos/LinearSystemSolver.h"
 
 
@@ -46,6 +47,8 @@ private:
     QPushButton *randButton, *fileButton, *solveButton, *resetButton;
 
     void setSlider();
+
+    void clearAnswerField();
 
     void setAMatrix(QGridLayout *aCells);
 

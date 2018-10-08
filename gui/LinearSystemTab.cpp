@@ -6,6 +6,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtCore/QDir>
 #include <QFileDialog>
+#include <QTextStream>
 #include "LinearSystemTab.h"
 
 LinearSystemTab::LinearSystemTab(QWidget *parent) : QWidget(parent) {
@@ -15,9 +16,8 @@ LinearSystemTab::LinearSystemTab(QWidget *parent) : QWidget(parent) {
     gridGroupBox = new QGroupBox(tr(""));
     auto *matrixLayout = new QGridLayout;
     answerField = new QTextEdit();
-    answerField->setPlainText(tr("--- ANSWER ---"));
-    answerField->setAlignment(Qt::AlignCenter);
     answerField->setMinimumWidth(400);
+    clearAnswerField();
     //task
     doubleValidator = new QDoubleValidator;
     doubleValidator->setNotation(QDoubleValidator::ScientificNotation);
@@ -97,7 +97,27 @@ void LinearSystemTab::solve() {
             A[i][j] = matrix[i][j]->text().replace(",", ".").toDouble();
         }
     }
-    compute(A, B, n, e);
+    clearAnswerField();
+    if (compute(A, B, n, e)) {
+        auto *X = getAnswer();
+        auto *Precisions = getPrecisions();
+        answerField->append("Число итераций : " +  QString::number(getIterationsNumber()) + "\n");
+        char endLineChar;
+        for (auto i = 0; i < n; i++) {
+            if (i == n-1) endLineChar = '.';
+            else endLineChar = ';';
+            int prec = e;
+            answerField->append("x" + QString::number(i+1) + " = " + QString::number(X[i], 'g', 7) +
+            ";  погрешность: " + QString::number(Precisions[i], 'g', 2) + endLineChar);
+
+        }
+    }
+    else answerField->append("Данная матрица не обладает свойством диагонального преобладания");
+}
+
+void LinearSystemTab::clearAnswerField(){
+    answerField->setPlainText(tr("--- ОТВЕТ --- \n\n"));
+    answerField->setAlignment(Qt::AlignCenter);
 }
 
 void LinearSystemTab::takeFromFile() {
@@ -107,32 +127,35 @@ void LinearSystemTab::takeFromFile() {
         QFile
                 taskFile(file);
         if (taskFile.exists()) {
-            try {taskFile.open(QIODevice::ReadOnly);
-            // clear matrix
-            for (int i = 0; i < n; i++){
-                matrix[i][n + 1]->setText("0");
-                for (int j = 0; j < n; j++){
-                    matrix[j][i]->setText("0");
-                }
-            }
-            int j = -1;
-            QString
-                    cell;
-                    foreach(QString
-                                    s, QString(taskFile.readAll()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts)) {
-                    j++;
-                    if (j == n) break;
-                    cell = s.section(" ", n, n).replace(",", ".");
-                    cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
-                    matrix[j][n + 1]->setText(cell);
-                    for (int i = 0; i < n; i++) {
-                        cell = s.section(" ", i, i).replace(",", ".");
-                        cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
-                        matrix[j][i]->setText(cell);
+            try {
+                taskFile.open(QIODevice::ReadOnly);
+                clearAnswerField();
+                // clear matrix
+                for (int i = 0; i < n; i++) {
+                    matrix[i][n + 1]->setText("0");
+                    for (int j = 0; j < n; j++) {
+                        matrix[j][i]->setText("0");
                     }
                 }
-            taskFile.close();
-            }catch (QFile::FileError & e) {
+                int j = -1;
+                QString
+                        cell;
+                        foreach(QString
+                                        s,
+                                QString(taskFile.readAll()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts)) {
+                        j++;
+                        if (j == n) break;
+                        cell = s.section(" ", n, n).replace(",", ".");
+                        cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
+                        matrix[j][n + 1]->setText(cell);
+                        for (int i = 0; i < n; i++) {
+                            cell = s.section(" ", i, i).replace(",", ".");
+                            cell = cell == "" ? "0" : QString::number(cell.toDouble(), 'g', 5);
+                            matrix[j][i]->setText(cell);
+                        }
+                    }
+                taskFile.close();
+            } catch (QFile::FileError &e) {
                 QMessageBox
                         readExcMsg;
                 readExcMsg.setText("Ошибка во время чтения файла \n ");
@@ -148,6 +171,7 @@ void LinearSystemTab::takeFromFile() {
 }
 
 void LinearSystemTab::reset() {
+    clearAnswerField();
     int n = numberSlider->value();
     for (auto i = 0; i < n; i++) {
         for (auto j = 0; j < n + 2; j++) {
@@ -157,6 +181,7 @@ void LinearSystemTab::reset() {
 }
 
 void LinearSystemTab::setRandom() {
+    clearAnswerField();
     int n = numberSlider->value();
     QString cell;
     for (auto i = 0; i < n; i++) {
@@ -236,6 +261,7 @@ QLineEdit *LinearSystemTab::createCell(QString text) {
 void LinearSystemTab::changeNumber(int newN) {
     numberLabel->setText(QString::fromStdString(std::to_string(newN)));
     numberSlider->setEnabled(false);
+    clearAnswerField();
     if (newN > currN) {
         int step = newN - currN;
         // move b and "="
@@ -315,3 +341,5 @@ void LinearSystemTab::changeNumber(int newN) {
  * точна/запятая
  * nan - система не решается методом гаусса
  * */
+
+

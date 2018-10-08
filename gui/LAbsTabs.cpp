@@ -37,7 +37,7 @@ LAbsTabs::LAbsTabs(QWidget *parent) : QDialog(parent) {
     mainLayout->addWidget(tabWidget);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Tab Dialog"));
+    setWindowTitle(tr("COMPUTATIONAL MATH"));
 }
 
 void LAbsTabs::exitProgramm() {
@@ -45,9 +45,17 @@ void LAbsTabs::exitProgramm() {
 }
 
 Interpolation::Interpolation(QWidget *parent) : QWidget(parent) {
-
+    auto *mainLayout = new QVBoxLayout;
+    auto *label= new QLabel("Sorry, this tab is under development");
+    label->setAlignment(Qt::AlignCenter);
+    mainLayout->addWidget(label);
+    setLayout(mainLayout);
 }
 
 ODETab::ODETab(QWidget *parent) : QWidget(parent) {
-
+    auto *mainLayout = new QVBoxLayout;
+    auto *label= new QLabel("Sorry, this tab is under development");
+    label->setAlignment(Qt::AlignCenter);
+    mainLayout->addWidget(label);
+    setLayout(mainLayout);
 }
