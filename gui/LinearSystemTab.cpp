@@ -54,34 +54,34 @@ void LinearSystemTab::setButtons() {
     buttonsGroupBox = new QGroupBox;
     auto *buttonsLayout = new QHBoxLayout;
 
-    randButton = new QPushButton("Сгенерировать рандомно");
-    fileButton = new QPushButton("Заполнить из файла");
-    solveButton = new QPushButton("Решить");
-    resetButton = new QPushButton("Сбросить");
+    randBtn = new QPushButton("Сгенерировать рандомно");
+    fileBtn = new QPushButton("Заполнить из файла");
+    solveBtn = new QPushButton("Решить");
+    resetBtn = new QPushButton("Сбросить");
 
-    randButton->setMaximumWidth(180);
-    fileButton->setMaximumWidth(180);
-    resetButton->setMaximumWidth(180);
-    solveButton->setMaximumWidth(180);
-    randButton->setMinimumHeight(40);
-    fileButton->setMinimumHeight(40);
-    resetButton->setMinimumHeight(40);
-    solveButton->setMinimumHeight(40);
+    randBtn->setMaximumWidth(180);
+    fileBtn->setMaximumWidth(180);
+    resetBtn->setMaximumWidth(180);
+    solveBtn->setMaximumWidth(180);
+    randBtn->setMinimumHeight(40);
+    fileBtn->setMinimumHeight(40);
+    resetBtn->setMinimumHeight(40);
+    solveBtn->setMinimumHeight(40);
     // TODO make stylesheet file
-    randButton->setStyleSheet("color : black; background : #C3A8A8");
-    fileButton->setStyleSheet("color : black; background : #C3A8A8");
-    resetButton->setStyleSheet("color : #710C02; background : #C3A8A8");
-    solveButton->setStyleSheet("color : #115404; background : #C3A8A8");
+    randBtn->setStyleSheet("color : black; background : #C3A8A8");
+    fileBtn->setStyleSheet("color : black; background : #C3A8A8");
+    resetBtn->setStyleSheet("color : #710C02; background : #C3A8A8");
+    solveBtn->setStyleSheet("color : #115404; background : #C3A8A8");
 
-    connect(resetButton, SIGNAL(clicked()), this, SLOT(reset()));
-    connect(randButton, SIGNAL(clicked()), this, SLOT(setRandom()));
-    connect(fileButton, SIGNAL(clicked()), this, SLOT(takeFromFile()));
-    connect(solveButton, SIGNAL(clicked()), this, SLOT(solve()));
+    connect(resetBtn, SIGNAL(clicked()), this, SLOT(reset()));
+    connect(randBtn, SIGNAL(clicked()), this, SLOT(setRandom()));
+    connect(fileBtn, SIGNAL(clicked()), this, SLOT(takeFromFile()));
+    connect(solveBtn, SIGNAL(clicked()), this, SLOT(solve()));
 
-    buttonsLayout->addWidget(randButton);
-    buttonsLayout->addWidget(fileButton);
-    buttonsLayout->addWidget(resetButton);
-    buttonsLayout->addWidget(solveButton);
+    buttonsLayout->addWidget(randBtn);
+    buttonsLayout->addWidget(fileBtn);
+    buttonsLayout->addWidget(resetBtn);
+    buttonsLayout->addWidget(solveBtn);
 
     buttonsGroupBox->setLayout(buttonsLayout);
 }
@@ -106,7 +106,6 @@ void LinearSystemTab::solve() {
         for (auto i = 0; i < n; i++) {
             if (i == n-1) endLineChar = '.';
             else endLineChar = ';';
-            int prec = e;
             answerField->append("x" + QString::number(i+1) + " = " + QString::number(X[i], 'g', 7) +
             ";  погрешность: " + QString::number(Precisions[i], 'g', 2) + endLineChar);
 
@@ -254,7 +253,6 @@ QLineEdit *LinearSystemTab::createCell(QString text) {
         aCell->setStyleSheet("* { background-color: white; color: black;}");
         aCell->setMaximumSize(50, 15);
     }
-
     return aCell;
 }
 
@@ -316,15 +314,13 @@ void LinearSystemTab::changeNumber(int newN) {
         }
 
         // set size 0 to others
-        for (int i = matrixBColomn; i < MAX_N + 2; i++) {
+        for (int i = matrixBColomn - step + 1; i < MAX_N + 2; i++) {
             for (int j = 0; j < MAX_N; j++) {
-                //matrix[j][i] = createCell("0");
                 matrix[j][i]->setMaximumSize(0, 0);
             }
         }
         for (int i = newN; i < MAX_N; i++) {
             for (int j = 0; j < MAX_N; j++) {
-                //matrix[j][i] = createCell("0");
                 matrix[i][j]->setMaximumSize(0, 0);
             }
         }
@@ -336,10 +332,3 @@ void LinearSystemTab::changeNumber(int newN) {
     numberSlider->setEnabled(true);
 
 }
-
-/*
- * точна/запятая
- * nan - система не решается методом гаусса
- * */
-
-

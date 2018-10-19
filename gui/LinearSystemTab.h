@@ -44,7 +44,7 @@ private:
     QLineEdit *precisionField;
     QSlider *numberSlider;
     QLabel *numberLabel;
-    QPushButton *randButton, *fileButton, *solveButton, *resetButton;
+    QPushButton *randBtn, *fileBtn, *solveBtn, *resetBtn;
 
     void setSlider();
 

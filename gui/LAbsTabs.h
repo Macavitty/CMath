@@ -40,7 +40,7 @@ private:
     QTabWidget *tabWidget;
     QMenu *simpleMenu;
     QMenuBar *menuBar;
-    QAction *exitAction;
+    QAction *exitAction, *aboutAction;
     QShortcut *keyCtrlW;
 };
 

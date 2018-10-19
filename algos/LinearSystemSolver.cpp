@@ -101,12 +101,6 @@ bool validateSystem(long double **A, long double *B, int n) {
             A[i][j] = tmpA[i][j];
         B[i] = tmpB[i];
     }
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < n; j++){
-           cout << A[i][j] << " ";
-        }
-        cout << endl;
-    }
     return true;
 }
 
