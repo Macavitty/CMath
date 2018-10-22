@@ -9,7 +9,6 @@
 class Function {
 public:
     friend class IntegrationTab;
-    friend class IntegrationSolver;
 private:
     double function_1(double);
     double function_2(double);
