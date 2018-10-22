@@ -1,12 +1,3 @@
-#include <QTabWidget>
-#include <QtWidgets/QMenuBar>
-#include <QtWidgets/QFormLayout>
-#include <QtWidgets/QPushButton>
-#include <QtCore/QFile>
-#include <QtWidgets/QMessageBox>
-#include <QtCore/QDir>
-#include <QFileDialog>
-#include <QTextStream>
 #include "LinearSystemTab.h"
 
 LinearSystemTab::LinearSystemTab(QWidget *parent) : QWidget(parent) {
@@ -99,7 +90,7 @@ void LinearSystemTab::solve() {
     }
     clearAnswerField();
     if (compute(A, B, n, e)) {
-        auto *X = getAnswer();
+        auto *X = getAnswSLAY();
         auto *Precisions = getPrecisions();
         answerField->append("Число итераций : " +  QString::number(getIterationsNumber()) + "\n");
         char endLineChar;

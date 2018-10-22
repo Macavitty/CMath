@@ -2,6 +2,15 @@
 #define COMPMATH_LINEARSYSTEMTAB_H
 
 #include <QDialog>
+#include <QTabWidget>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QFormLayout>
+#include <QtWidgets/QPushButton>
+#include <QtCore/QFile>
+#include <QtWidgets/QMessageBox>
+#include <QtCore/QDir>
+#include <QFileDialog>
+#include <QTextStream>
 #include <QtWidgets/QShortcut>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QGridLayout>

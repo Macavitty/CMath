@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <fstream>
-#include <iostream>
-#include <algorithm>
-#include <vector>
-#include <cmath>
+
 #include "LinearSystemSolver.h"
 
 using namespace std;
@@ -104,7 +99,7 @@ bool validateSystem(long double **A, long double *B, int n) {
     return true;
 }
 
-long double *getAnswer() {
+long double *getAnswSLAY() {
     return Xnext;
 }
 

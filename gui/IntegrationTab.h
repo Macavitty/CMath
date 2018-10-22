@@ -21,20 +21,27 @@
 #include <QRadioButton>
 #include <QTextBlock>
 #include <QPushButton>
+#include <QtGui/QVector2D>
+#include <QtWidgets/QToolTip>
+#include "algos/IntegrationSolver.h"
+#include "helpers/Function.h"
 
 class IntegrationTab : public QWidget {
-
+Q_OBJECT
 public:
     explicit IntegrationTab(QWidget *parent = nullptr);
 
+private slots:
+    void unsetErrPres(); // no better solution was found , so TODO
+    void unsetErrLow();
+    void unsetErrUpp();
+    void solve();
 private:
     QGridLayout *contentLayout;
-    QTableWidget *funcTable;
-    QRadioButton *func_1, *func_2, *func_3, *func_4;
+    QRadioButton *funcBtn_0, *funcBtn_1, *funcBtn_2, *funcBtn_3;
     QLabel *answerField;
-    QTextBlock *textBlock;
     QGridLayout *filtLayout;
-    QLineEdit *precisionField, *hBoundField, *lBoundField;
+    QLineEdit *precisionField, *uBoundField, *lBoundField;
     QDoubleValidator *doubleValidator;
     QGroupBox *groupBox;
     QButtonGroup *btnGroup;
@@ -43,6 +50,15 @@ private:
     void setBtnGroup();
     void tuneAswField();
     void setLineEdit(QLineEdit *l);
+    void setUpStruct();
+    bool checkInput();
+    void setErr(QString msg, QLineEdit *field);
+    void unsetErr(QLineEdit *field);
+    struct functionStr{
+        QVector<QString> funcStr;
+        QVector<double (Function::*)(double)> funcs; // the vector of pointers to functions
+    };
+    functionStr f;
 };
 
 #endif //COMPMATH_INTEGRATIONTAB_H

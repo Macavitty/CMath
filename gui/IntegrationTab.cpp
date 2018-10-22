@@ -1,6 +1,9 @@
 #include "IntegrationTab.h"
 
 IntegrationTab::IntegrationTab(QWidget *parent) : QWidget(parent) {
+    //structure
+    setUpStruct();
+
     auto mainLayout = new QVBoxLayout;
     contentLayout = new QGridLayout();
     filtLayout = new QGridLayout();
@@ -15,11 +18,12 @@ IntegrationTab::IntegrationTab(QWidget *parent) : QWidget(parent) {
     solveBtn->setStyleSheet("color : #115404; background : #C3A8A8");
     solveBtn->setMaximumWidth(180);
     solveBtn->setMinimumHeight(40);
+    connect(solveBtn, SIGNAL(clicked()), this, SLOT(solve()));
 
     setFiltLayout();
 
     auto answerLayout = new QVBoxLayout;
-    answerLayout->setContentsMargins(100,10,50,10);
+    answerLayout->setContentsMargins(100, 10, 50, 10);
     answerField = new QLabel("--- ОТВЕТ ---\n\n");
     tuneAswField();
     answerLayout->addWidget(answerField);
@@ -38,22 +42,22 @@ IntegrationTab::IntegrationTab(QWidget *parent) : QWidget(parent) {
 
 void IntegrationTab::setBtnGroup() {
     // create and set functions
-    func_1 = new QRadioButton("f(x) = x\u2075 + 6\u00b7x + 7");
-    func_2 = new QRadioButton("y = 2x");
-    func_3 = new QRadioButton("y = 3x");
-    func_4 = new QRadioButton("y = 4x");
+    funcBtn_0 = new QRadioButton(f.funcStr.at(0)); // "f(x) = x\u2075 + 6\u00b7x + 7"
+    funcBtn_1 = new QRadioButton(f.funcStr.at(1));
+    funcBtn_2 = new QRadioButton(f.funcStr.at(2));
+    funcBtn_3 = new QRadioButton(f.funcStr.at(3));
 
-    func_1->setStyleSheet("font: 20px; color: #181322");
-    func_2->setStyleSheet("font: 20px; color: #181322");
-    func_3->setStyleSheet("font: 20px; color: #181322");
-    func_4->setStyleSheet("font: 20px; color: #181322");
+    funcBtn_0->setStyleSheet("font: 20px; color: #181322");
+    funcBtn_1->setStyleSheet("font: 20px; color: #181322");
+    funcBtn_2->setStyleSheet("font: 20px; color: #181322");
+    funcBtn_3->setStyleSheet("font: 20px; color: #181322");
 
-    btnGroup->addButton(func_1, 1);
-    btnGroup->addButton(func_2, 2);
-    btnGroup->addButton(func_3, 3);
-    btnGroup->addButton(func_4, 4);
+    btnGroup->addButton(funcBtn_0, 0);
+    btnGroup->addButton(funcBtn_1, 1);
+    btnGroup->addButton(funcBtn_2, 3);
+    btnGroup->addButton(funcBtn_3, 4);
 
-    func_1->setChecked(true);
+    funcBtn_0->setChecked(true);
 }
 
 void IntegrationTab::tuneAswField() {
@@ -75,11 +79,14 @@ void IntegrationTab::setFiltLayout() {
     auto *forms = new QFormLayout;
 
     precisionField = new QLineEdit;
-    hBoundField = new QLineEdit;
+    uBoundField = new QLineEdit;
     lBoundField = new QLineEdit;
     setLineEdit(precisionField);
-    setLineEdit(hBoundField);
+    setLineEdit(uBoundField);
     setLineEdit(lBoundField);
+    connect(precisionField, SIGNAL(editingFinished()), this, SLOT(unsetErrPres()));
+    connect(lBoundField, SIGNAL(editingFinished()), this, SLOT(unsetErrLow()));
+    connect(uBoundField, SIGNAL(editingFinished()), this, SLOT(unsetErrUpp()));
     auto l1 = new QLabel("Нижний предел:");
     auto l2 = new QLabel("Верхний предел:");
     auto l3 = new QLabel("Точность:");
@@ -87,18 +94,18 @@ void IntegrationTab::setFiltLayout() {
     l2->setStyleSheet("font: 18px");
     l3->setStyleSheet("font: 18px");
     forms->addRow(l1, lBoundField);
-    forms->addRow(l2, hBoundField);
+    forms->addRow(l2, uBoundField);
     forms->addRow(l3, precisionField);
     forms->setAlignment(Qt::AlignRight);
 
-    filtLayout->addWidget(func_1, 0, 0);
-    filtLayout->addWidget(func_2, 1, 0);
-    filtLayout->addWidget(func_3, 2, 0);
-    filtLayout->addWidget(func_4, 3, 0);
+    filtLayout->addWidget(funcBtn_0, 0, 0);
+    filtLayout->addWidget(funcBtn_1, 1, 0);
+    filtLayout->addWidget(funcBtn_2, 2, 0);
+    filtLayout->addWidget(funcBtn_3, 3, 0);
     filtLayout->addLayout(forms, 4, 0);
-    filtLayout->addWidget(solveBtn, 5,0);
+    filtLayout->addWidget(solveBtn, 5, 0);
 
-    filtLayout->setContentsMargins(10,10,100,10);
+    filtLayout->setContentsMargins(10, 10, 100, 10);
 }
 
 void IntegrationTab::setLineEdit(QLineEdit *l) {
@@ -106,4 +113,76 @@ void IntegrationTab::setLineEdit(QLineEdit *l) {
     l->setMaxLength(20);
     l->setMaximumSize(200, 25);
     l->setMinimumWidth(100);
+}
+
+void IntegrationTab::solve() {
+    if (checkInput()) {
+        Function fObj;
+        compute(uBoundField->text().toDouble(),
+                lBoundField->text().toDouble(),
+                precisionField->text().toDouble(),
+                f.funcs.at(btnGroup->checkedId()),
+                fObj);
+    }
+}
+
+bool IntegrationTab::checkInput() { // TODO it`s too ugly - change
+    QString empty = "ну и где чиселка?";
+    if (precisionField->text().replace(" ", "") == "" ||
+        lBoundField->text().replace(" ", "") == "" ||
+        uBoundField->text().replace(" ", "") == "") {
+        if (precisionField->text().replace(" ", "") == "")
+            setErr(empty, precisionField);
+
+        if (lBoundField->text().replace(" ", "") == "")
+            setErr(empty, lBoundField);
+
+        if (uBoundField->text().replace(" ", "") == "")
+            setErr(empty, uBoundField);
+        return false;
+    }
+
+    double a = uBoundField->text().replace(",", ".").toDouble();
+    double b = lBoundField->text().replace(",", ".").toDouble();
+    if (a < b) {
+        uBoundField->setText(QString::number(b));
+        lBoundField->setText(QString::number(a));
+    }
+    return true;
+}
+
+void IntegrationTab::setErr(QString msg, QLineEdit *field) {
+    QToolTip::showText(field->pos() + field->pos() / 4, msg, field);
+    field->setStyleSheet("border: 1px solid red;");
+}
+
+void IntegrationTab::unsetErrPres() {
+    unsetErr(precisionField);
+}
+
+void IntegrationTab::unsetErrLow() {
+    unsetErr(lBoundField);
+}
+
+void IntegrationTab::unsetErrUpp() {
+    unsetErr(uBoundField);
+}
+
+void IntegrationTab::unsetErr(QLineEdit *field) {
+    field->setStyleSheet("border: none");
+    field->setStyleSheet("border: 1px solid #C3A8A8");
+}
+
+void IntegrationTab::setUpStruct() {
+    f.funcs.push_back(&Function::function_1);
+    f.funcStr.push_back("y = x + x*x");
+
+    f.funcs.push_back(&Function::function_2);
+    f.funcStr.push_back("y = x + 2");
+
+    f.funcs.push_back(&Function::function_3);
+    f.funcStr.push_back("y = x + 3");
+
+    f.funcs.push_back(&Function::function_4);
+    f.funcStr.push_back("y = x + 4");
 }
