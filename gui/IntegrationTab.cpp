@@ -42,20 +42,36 @@ IntegrationTab::IntegrationTab(QWidget *parent) : QWidget(parent) {
 
 void IntegrationTab::setBtnGroup() {
     // create and set functions
-    funcBtn_0 = new QRadioButton(f.funcStr.at(0)); // "f(x) = x\u2075 + 6\u00b7x + 7"
-    funcBtn_1 = new QRadioButton(f.funcStr.at(1));
-    funcBtn_2 = new QRadioButton(f.funcStr.at(2));
-    funcBtn_3 = new QRadioButton(f.funcStr.at(3));
+    //funcBtn_0 = new QRadioButton(f.funcStr.at(0)); // "f(x) = x\u2075 + 6\u00b7x + 7"
+    funcBtn_0 = new QRadioButton; // "f(x) = x\u2075 + 6\u00b7x + 7"
+    funcBtn_1 = new QRadioButton();
+    funcBtn_2 = new QRadioButton();
+    funcBtn_3 = new QRadioButton();
 
-    funcBtn_0->setStyleSheet("font: 20px; color: #181322");
+    funcBtn_0->setStyleSheet("font: 20px; color: #181322;");
     funcBtn_1->setStyleSheet("font: 20px; color: #181322");
     funcBtn_2->setStyleSheet("font: 20px; color: #181322");
     funcBtn_3->setStyleSheet("font: 20px; color: #181322");
 
+    /*
+     * WARNING
+     * don`t forget to set up working directory correctly
+     * e. g. "/home/macavitty/CLionProjects/CMath"
+     * */
+    funcBtn_0->setIcon(QIcon("gui/images/func_0.png"));
+    funcBtn_1->setIcon(QIcon("gui/images/func_1.png"));
+    funcBtn_2->setIcon(QIcon("gui/images/func_2.png"));
+    funcBtn_3->setIcon(QIcon("gui/images/func_3.png"));
+
+    funcBtn_0->setIconSize(QSize(500, 60));
+    funcBtn_1->setIconSize(QSize(400, 60));
+    funcBtn_2->setIconSize(QSize(500, 60));
+    funcBtn_3->setIconSize(QSize(500, 60));
+
     btnGroup->addButton(funcBtn_0, 0);
     btnGroup->addButton(funcBtn_1, 1);
-    btnGroup->addButton(funcBtn_2, 3);
-    btnGroup->addButton(funcBtn_3, 4);
+    btnGroup->addButton(funcBtn_2, 2);
+    btnGroup->addButton(funcBtn_3, 3);
 
     funcBtn_0->setChecked(true);
 }
@@ -93,8 +109,8 @@ void IntegrationTab::setFiltLayout() {
     l1->setStyleSheet("font: 18px");
     l2->setStyleSheet("font: 18px");
     l3->setStyleSheet("font: 18px");
-    forms->addRow(l1, lBoundField);
     forms->addRow(l2, uBoundField);
+    forms->addRow(l1, lBoundField);
     forms->addRow(l3, precisionField);
     forms->setAlignment(Qt::AlignRight);
 
@@ -174,15 +190,15 @@ void IntegrationTab::unsetErr(QLineEdit *field) {
 }
 
 void IntegrationTab::setUpStruct() {
-    f.funcs.push_back(&Function::function_1);
+    f.funcs.push_back(&Function::function_0);
     f.funcStr.push_back("y = x + x*x");
 
-    f.funcs.push_back(&Function::function_2);
+    f.funcs.push_back(&Function::function_1);
     f.funcStr.push_back("y = x + 2");
 
-    f.funcs.push_back(&Function::function_3);
+    f.funcs.push_back(&Function::function_2);
     f.funcStr.push_back("y = x + 3");
 
-    f.funcs.push_back(&Function::function_4);
+    f.funcs.push_back(&Function::function_3);
     f.funcStr.push_back("y = x + 4");
 }
