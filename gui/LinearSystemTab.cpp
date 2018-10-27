@@ -209,7 +209,7 @@ void LinearSystemTab::setSlider() {
     numberSlider->setTickInterval(10);
     numberLabel = new QLabel;
     numberLabel->setText("20");
-    connect(numberSlider, SIGNAL(valueChanged(int)), this, SLOT(changeNumber(int)));
+    connect(numberSlider, SIGNAL(valueChanged(int)), this, SLOT(changeCellsNmb(int)));
 }
 
 void LinearSystemTab::setAMatrix(QGridLayout *aCells) {
@@ -247,7 +247,7 @@ QLineEdit *LinearSystemTab::createCell(QString text) {
     return aCell;
 }
 
-void LinearSystemTab::changeNumber(int newN) {
+void LinearSystemTab::changeCellsNmb(int newN) {
     numberLabel->setText(QString::fromStdString(std::to_string(newN)));
     numberSlider->setEnabled(false);
     clearAnswerField();
@@ -306,8 +306,8 @@ void LinearSystemTab::changeNumber(int newN) {
 
         // set size 0 to others
         for (int i = matrixBColomn - step + 1; i < MAX_N + 2; i++) {
-            for (int j = 0; j < MAX_N; j++) {
-                matrix[j][i]->setMaximumSize(0, 0);
+            for (auto &j : matrix) {
+                j[i]->setMaximumSize(0, 0);
             }
         }
         for (int i = newN; i < MAX_N; i++) {

@@ -136,9 +136,15 @@ void IntegrationTab::solve() {
         Function fObj;
         compute(uBoundField->text().toDouble(),
                 lBoundField->text().toDouble(),
-                precisionField->text().toDouble(),
+                precisionField->text().replace(",", ".").toDouble(),
                 f.funcs.at(btnGroup->checkedId()),
                 fObj);
+        answerField->setText("---ОТВЕТ---\n\n\n\n\n\n\n\n Значение интеграла: "
+                             + QString::number(getAnswIntegr(), 'g', 8)
+                             + "\n\nКоличество разбиений: "
+                             + QString::number(getPartsNumber())
+                             + "\n\nПолученная порешность: "
+                             + QString::number(getPrecision(), 'g', 2));
     }
 }
 

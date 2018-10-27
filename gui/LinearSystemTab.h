@@ -19,7 +19,7 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QLabel>
 #include <QDoubleValidator>
-#include <math.h>
+#include <cmath>
 #include "algos/LinearSystemSolver.h"
 
 
@@ -30,7 +30,7 @@ public:
 
 private slots:
 
-    void changeNumber(int newN);
+    void changeCellsNmb(int newN);
 
     void reset();
 

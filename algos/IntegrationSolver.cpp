@@ -11,15 +11,13 @@ double h; // step
 double In, I;
 
 
-bool compute(double upper, double lower, double eps, double (Function::* func)(double), Function &obj){
-    printf("HAH it works!\n");
+void compute(double upper, double lower, double eps, double (Function::* func)(double), Function &obj){
     In = 1, I = 0;
-    for (n = 5; (n < 100000 && fabs(In - I) > eps); n *= 2){
+    for (n = 5; (n < 100000 && fabs(In - I)/3 >= eps); n *= 2){ // using Runge method for approximation
 
         h = (upper - lower)/n; // step
 
         double summ = (obj.*func)(upper)/2 + (obj.*func)(lower)/2;
-        printf("%f\n", In);
         for (int i = 1; i < n; i++){
             summ += (obj.*func)(lower + i*h);
         }
@@ -28,15 +26,14 @@ bool compute(double upper, double lower, double eps, double (Function::* func)(d
         I = In;
         In  = summ;
     }
-
 }
 
-double getAnswInt(){
+double getAnswIntegr(){
     return In;
 }
 double getPrecision(){
-    return 1;
+    return fabs(In - I)/3;
 }
-int partNumber(){
+int getPartsNumber(){
     return n;
 }

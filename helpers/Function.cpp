@@ -9,15 +9,15 @@
 //typedef double (Function::*somefunc(double));
 
 double Function::function_0(double x) {
-    return atan(pow((6 * x + 2), 1.0 / 3.0));
+    return atan(copysign(pow((fabs(6 * x + 2)), 1.0 / 3), (6 * x + 2)));
 }
 
 double Function::function_1(double x) {
-    return exp(2 * pow((x), 1.0 / 5.0) * sin(x/4));
+    return exp(2 * copysign(pow(fabs(x), x), 1.0 / 5.0) * sin(x / 4));
 }
 
 double Function::function_2(double x) {
-    return sqrt(x * x + 5.0/6);
+    return sqrt(x * x + 5.0 / 6);
 }
 
 double Function::function_3(double x) {
