@@ -13,7 +13,7 @@ double Function::function_0(double x) {
 }
 
 double Function::function_1(double x) {
-    return exp(2 * copysign(pow(fabs(x), x), 1.0 / 5.0) * sin(x / 4));
+    return exp(2 * copysign(pow(fabs(x), 1.0 / 5), x) * sin(x / 4));
 }
 
 double Function::function_2(double x) {

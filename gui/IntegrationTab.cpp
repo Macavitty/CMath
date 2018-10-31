@@ -2,7 +2,7 @@
 
 IntegrationTab::IntegrationTab(QWidget *parent) : QWidget(parent) {
     //structure
-    setUpStruct();
+    setUpFunctions();
 
     auto mainLayout = new QVBoxLayout;
     contentLayout = new QGridLayout();
@@ -136,7 +136,7 @@ void IntegrationTab::solve() {
         compute(uBoundField->text().toDouble(),
                 lBoundField->text().toDouble(),
                 precisionField->text().replace(",", ".").toDouble(),
-                f.funcs.at(btnGroup->checkedId()),
+                funcsVector.at(btnGroup->checkedId()),
                 fObj);
         answerField->setText("---ОТВЕТ---\n\n\n\n\n\n\n\n Значение интеграла: "
                              + QString::number(getAnswIntegr(), 'g', 8)
@@ -165,10 +165,13 @@ bool IntegrationTab::checkInput() { // TODO it`s too ugly - change
 
     double a = uBoundField->text().replace(",", ".").toDouble();
     double b = lBoundField->text().replace(",", ".").toDouble();
+    double eps = precisionField->text().replace(" ", "").toDouble();
     if (a < b) {
         uBoundField->setText(QString::number(b));
         lBoundField->setText(QString::number(a));
     }
+    if (eps < 0 )
+        precisionField->setText(QString::number(eps*(-1)));
     return true;
 }
 
@@ -194,13 +197,13 @@ void IntegrationTab::unsetErr(QLineEdit *field) {
     field->setStyleSheet("border: 1px solid #C3A8A8");
 }
 
-void IntegrationTab::setUpStruct() {
+void IntegrationTab::setUpFunctions() {
 
-    f.funcs.push_back(&Function::function_0);
+    funcsVector.push_back(&Function::function_0);
 
-    f.funcs.push_back(&Function::function_1);
+    funcsVector.push_back(&Function::function_1);
 
-    f.funcs.push_back(&Function::function_2);
+    funcsVector.push_back(&Function::function_2);
 
-    f.funcs.push_back(&Function::function_3);
+    funcsVector.push_back(&Function::function_3);
 }

@@ -2,6 +2,7 @@
 // Created by tania on 19.10.18.
 //
 
+#include <iostream>
 #include "IntegrationSolver.h"
 
 using namespace std;
@@ -9,7 +10,7 @@ using namespace std;
 int n; // as the number of partitions is unknown, we can take any (5 in our case)
 double h; // step
 double In, I;
-const int LIMIT = 100000;
+const int LIMIT = 10000000;
 
 
 void compute(double upper, double lower, double eps, double (Function::* func)(double), Function &obj){
