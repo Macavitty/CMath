@@ -9,13 +9,14 @@ using namespace std;
 int n; // as the number of partitions is unknown, we can take any (5 in our case)
 double h; // step
 double In, I;
+const int LIMIT = 100000;
 
 
 void compute(double upper, double lower, double eps, double (Function::* func)(double), Function &obj){
     In = 1, I = 0;
-    for (n = 5; (n < 100000 && fabs(In - I)/3 >= eps); n *= 2){ // using Runge method for approximation
+    for (n = 5; (n < LIMIT && fabs(In - I)/3 >= eps); n *= 2){ // using Runge method for approximation
 
-        h = (upper - lower)/n; // step
+        h = (upper - lower)/n; // new step
 
         double summ = (obj.*func)(upper)/2 + (obj.*func)(lower)/2;
         for (int i = 1; i < n; i++){

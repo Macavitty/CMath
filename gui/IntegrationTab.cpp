@@ -42,8 +42,7 @@ IntegrationTab::IntegrationTab(QWidget *parent) : QWidget(parent) {
 
 void IntegrationTab::setBtnGroup() {
     // create and set functions
-    //funcBtn_0 = new QRadioButton(f.funcStr.at(0)); // "f(x) = x\u2075 + 6\u00b7x + 7"
-    funcBtn_0 = new QRadioButton; // "f(x) = x\u2075 + 6\u00b7x + 7"
+    funcBtn_0 = new QRadioButton;
     funcBtn_1 = new QRadioButton();
     funcBtn_2 = new QRadioButton();
     funcBtn_3 = new QRadioButton();
@@ -196,15 +195,12 @@ void IntegrationTab::unsetErr(QLineEdit *field) {
 }
 
 void IntegrationTab::setUpStruct() {
+
     f.funcs.push_back(&Function::function_0);
-    f.funcStr.push_back("y = x + x*x");
 
     f.funcs.push_back(&Function::function_1);
-    f.funcStr.push_back("y = x + 2");
 
     f.funcs.push_back(&Function::function_2);
-    f.funcStr.push_back("y = x + 3");
 
     f.funcs.push_back(&Function::function_3);
-    f.funcStr.push_back("y = x + 4");
 }

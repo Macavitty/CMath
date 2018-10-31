@@ -15,10 +15,12 @@ LAbsTabs::LAbsTabs(QWidget *parent) : QDialog(parent) {
     tabWidget = new QTabWidget;
     linearSystemTab = new LinearSystemTab;
     integrationTab = new IntegrationTab;
+    interpolationTab = new InterpolationTab;
+    odeTab = new ODETab;
     tabWidget->addTab(linearSystemTab, tr("СЛАУ"));
     tabWidget->addTab(integrationTab, tr("Интегрирование"));
-    tabWidget->addTab(new Interpolation(), tr("Интерполирование"));
-    tabWidget->addTab(new ODETab(), tr("ОДУ"));
+    tabWidget->addTab(interpolationTab, tr("Интерполирование"));
+    tabWidget->addTab(odeTab, tr("ОДУ"));
     tabWidget->setCurrentWidget(integrationTab);
 
     auto *mainLayout = new QVBoxLayout;
@@ -67,20 +69,4 @@ LAbsTabs::LAbsTabs(QWidget *parent) : QDialog(parent) {
 
 void LAbsTabs::exitProgramm() {
     this->close();
-}
-
-Interpolation::Interpolation(QWidget *parent) : QWidget(parent) {
-    auto *mainLayout = new QVBoxLayout;
-    auto *label = new QLabel("Sorry, this tab is under development");
-    label->setAlignment(Qt::AlignCenter);
-    mainLayout->addWidget(label);
-    setLayout(mainLayout);
-}
-
-ODETab::ODETab(QWidget *parent) : QWidget(parent) {
-    auto *mainLayout = new QVBoxLayout;
-    auto *label = new QLabel("Sorry, this tab is under development");
-    label->setAlignment(Qt::AlignCenter);
-    mainLayout->addWidget(label);
-    setLayout(mainLayout);
 }

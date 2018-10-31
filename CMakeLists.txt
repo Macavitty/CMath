@@ -19,7 +19,7 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 # Добавление флагов компиляции для Qt проекта
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
-add_executable(CompMath main.cpp gui/LAbsTabs.cpp gui/LAbsTabs.h gui/LinearSystemTab.cpp gui/LinearSystemTab.h gui/IntegrationTab.cpp gui/IntegrationTab.h algos/LinearSystemSolver.cpp algos/LinearSystemSolver.h algos/IntegrationSolver.cpp algos/IntegrationSolver.h helpers/Function.cpp helpers/Function.h)
+add_executable(CompMath main.cpp gui/LAbsTabs.cpp gui/LAbsTabs.h gui/LinearSystemTab.cpp gui/LinearSystemTab.h gui/IntegrationTab.cpp gui/IntegrationTab.h algos/LinearSystemSolver.cpp algos/LinearSystemSolver.h algos/IntegrationSolver.cpp algos/IntegrationSolver.h helpers/Function.cpp helpers/Function.h gui/InterpolationTab.cpp gui/InterpolationTab.h gui/ODETab.cpp gui/ODETab.h algos/InterpolationSolver.cpp algos/InterpolationSolver.h algos/ODESolver.cpp algos/ODESolver.h)
 
 target_link_libraries(${PROJECT_NAME} Qt5::Core)
 target_link_libraries(${PROJECT_NAME} Qt5::Gui)
