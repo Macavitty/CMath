@@ -7,7 +7,7 @@
 #include<cmath>
 #include "helpers/Function.h"
 
-void compute(double upper, double lower, double eps, double (Function::*)(double), Function &obj);
+bool compute(double upper, double lower, double eps, double (Function::*)(double), Function &obj);
 double getAnswIntegr();
 double getPrecision();
 int getPartsNumber();

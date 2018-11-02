@@ -24,7 +24,7 @@ IntegrationTab::IntegrationTab(QWidget *parent) : QWidget(parent) {
 
     auto answerLayout = new QVBoxLayout;
     answerLayout->setContentsMargins(100, 10, 50, 10);
-    answerField = new QLabel("--- ОТВЕТ ---\n\n");
+    answerField = new QTextEdit;
     tuneAswField();
     answerLayout->addWidget(answerField);
 
@@ -38,6 +38,11 @@ IntegrationTab::IntegrationTab(QWidget *parent) : QWidget(parent) {
     mainLayout->addWidget(groupBox);
 
     setLayout(mainLayout);
+}
+
+void IntegrationTab::clearAnswerField() {
+    answerField->setPlainText(tr("--- ОТВЕТ --- \n\n\n\n"));
+    answerField->setAlignment(Qt::AlignCenter);
 }
 
 void IntegrationTab::setBtnGroup() {
@@ -79,10 +84,11 @@ void IntegrationTab::tuneAswField() {
     answerField->setStyleSheet("background : white; "
                                "border: 1px solid #C3A8A8; "
                                "border-radius: 8px; "
-                               "font: 16px; "
+                               "font: 15px; "
                                "color: #181322");
     answerField->setFixedSize(600, 500);
     answerField->setMinimumSize(600, 500);
+    answerField->setPlainText(tr("--- ОТВЕТ --- \n\n\n\n"));
     answerField->setAlignment(Qt::AlignHCenter);
 }
 
@@ -131,24 +137,30 @@ void IntegrationTab::setLineEdit(QLineEdit *l) {
 }
 
 void IntegrationTab::solve() {
+    clearAnswerField();
     if (checkInput()) {
         Function fObj;
-        compute(uBoundField->text().toDouble(),
-                lBoundField->text().toDouble(),
-                precisionField->text().replace(",", ".").toDouble(),
-                funcsVector.at(btnGroup->checkedId()),
-                fObj);
-        answerField->setText("---ОТВЕТ---\n\n\n\n\n\n\n\n Значение интеграла: "
-                             + QString::number(getAnswIntegr(), 'g', 8)
-                             + "\n\nКоличество разбиений: "
-                             + QString::number(getPartsNumber())
-                             + "\n\nПолученная порешность: "
-                             + QString::number(getPrecision(), 'g', 2));
+        if (compute(uBoundField->text().toDouble(),
+                    lBoundField->text().toDouble(),
+                    precisionField->text().replace(",", ".").toDouble(),
+                    funcsVector.at(btnGroup->checkedId()),
+                    fObj))
+            answerField->append("Значение интеграла: "
+                                + QString::number(getAnswIntegr(), 'g', 7)
+                                + "\n\nКоличество разбиений: "
+                                + QString::number(getPartsNumber())
+                                + "\n\nПолученная порешность: "
+                                + QString::number(getPrecision(), 'g', 4));
+        else
+            answerField->append("Данная функция не является непрерывной на ["
+                                + QString::number(lBoundField->text().toDouble())
+                                + " ; " + QString::number(uBoundField->text().toDouble())
+                                + "]");
     }
 }
 
 bool IntegrationTab::checkInput() { // TODO it`s too ugly - change
-    QString empty = "ну и где чиселка?";
+    QString empty = "где чиселка?";
     if (precisionField->text().replace(" ", "") == "" ||
         lBoundField->text().replace(" ", "") == "" ||
         uBoundField->text().replace(" ", "") == "") {
@@ -170,8 +182,8 @@ bool IntegrationTab::checkInput() { // TODO it`s too ugly - change
         uBoundField->setText(QString::number(b));
         lBoundField->setText(QString::number(a));
     }
-    if (eps < 0 )
-        precisionField->setText(QString::number(eps*(-1)));
+    if (eps < 0)
+        precisionField->setText(QString::number(eps * (-1)));
     return true;
 }
 

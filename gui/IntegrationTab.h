@@ -43,7 +43,7 @@ private slots:
 private:
     QGridLayout *contentLayout;
     QRadioButton *funcBtn_0, *funcBtn_1, *funcBtn_2, *funcBtn_3;
-    QLabel *answerField;
+    QTextEdit *answerField;
     QGridLayout *filtLayout;
     QLineEdit *precisionField, *uBoundField, *lBoundField;
     QDoubleValidator *doubleValidator;
@@ -56,6 +56,8 @@ private:
     void setBtnGroup();
 
     void tuneAswField();
+
+    void clearAnswerField();
 
     void setLineEdit(QLineEdit *l);
 
