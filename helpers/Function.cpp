@@ -19,4 +19,4 @@ double Function::function_2(double x) {
 }
 
 double Function::function_3(double x) {
-    return log(3 + x * x) / (log(4) * 5}
+    return log(3 + x * x) / (log(4) * 5);}

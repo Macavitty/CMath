@@ -146,7 +146,7 @@ void IntegrationTab::solve() {
                     funcsVector.at(btnGroup->checkedId()),
                     fObj))
             answerField->append("Значение интеграла: "
-                                + QString::number(getAnswIntegr(), 'g', 7)
+                                + QString::number(getAnswIntegr(), 'g', 8)
                                 + "\n\nКоличество разбиений: "
                                 + QString::number(getPartsNumber())
                                 + "\n\nПолученная порешность: "
