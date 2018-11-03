@@ -18,5 +18,4 @@ double Function::function_2(double x) {
     return sqrt(x * x - 5.0 / 6);
 }
 
-double Function::function_3(double x) {
-    return log(3 + x * x) / (log(4) * 5}
+double Function::function_3(double x) { return log(3 + x * x) / (log(4) * 5);}
