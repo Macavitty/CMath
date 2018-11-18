@@ -13,31 +13,31 @@ double I2n, In;
 const int M = 10000000; // max number of partitions
 
 bool compute(double upper, double lower, double eps,
-             double (Function::* func)(double), Function &obj) {
+             double (Function::* func)(double), Function &funcObj) {
     n = 5;
     h = (upper - lower) / n;
 
     // find integrals for n0 and n0 * 2
-    In = ((obj.*func)(upper) / 2 + (obj.*func)(lower) / 2);
+    In = ((funcObj.*func)(upper) / 2 + (funcObj.*func)(lower) / 2);
     I2n = In;
-    for (int i = 1; i < n; i++) In += (obj.*func)(lower + i * h);
+    for (int i = 1; i < n; i++) In += (funcObj.*func)(lower + i * h);
     In *= h;
     n *= 2;
     h /= 2;
-    for (int i = 1; i < n; i++) I2n += (obj.*func)(lower + i * h);
+    for (int i = 1; i < n; i++) I2n += (funcObj.*func)(lower + i * h);
     I2n *= h;
 
     if (isnan(I2n)) return false;
     if (fabs(I2n - In) / 3 < eps) return true;
 
-    // reach the needed precision
+    // reaching the needed precision
     for (n *= 2; (n < M && fabs(I2n - In) / 3 >= eps); n *= 2) { // Runge method for approximation
 
         h /= 2; // new step
 
-        double summ = (obj.*func)(upper) / 2 + (obj.*func)(lower) / 2;
+        double summ = (funcObj.*func)(upper) / 2 + (funcObj.*func)(lower) / 2;
         for (int i = 1; i < n; i++) {
-            summ += (obj.*func)(lower + i * h);
+            summ += (funcObj.*func)(lower + i * h);
         }
         if (isnan(summ)) return false;
         summ *= h;

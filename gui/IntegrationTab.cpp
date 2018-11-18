@@ -60,12 +60,12 @@ void IntegrationTab::setBtnGroup() {
     /*
      * WARNING
      * don`t forget to set up working directory correctly
-     * e. g. "/home/macavitty/CLionProjects/CMath"
+     * e. g. in linux "/home/macavitty/CLionProjects/CMath"
      * */
-    funcBtn_0->setIcon(QIcon("gui/images/func_0.png"));
-    funcBtn_1->setIcon(QIcon("gui/images/func_1.png"));
-    funcBtn_2->setIcon(QIcon("gui/images/func_2.png"));
-    funcBtn_3->setIcon(QIcon("gui/images/func_3.png"));
+    funcBtn_0->setIcon(QIcon("gui/img/func_0.png"));
+    funcBtn_1->setIcon(QIcon("gui/img/func_1.png"));
+    funcBtn_2->setIcon(QIcon("gui/img/func_2.png"));
+    funcBtn_3->setIcon(QIcon("gui/img/func_3.png"));
 
     funcBtn_0->setIconSize(QSize(500, 60));
     funcBtn_1->setIconSize(QSize(400, 60));
@@ -94,7 +94,7 @@ void IntegrationTab::tuneAswField() {
 
 void IntegrationTab::setFiltLayout() {
 
-    btnGroup = new QButtonGroup;
+    btnGroup = new QButtonGroup{};
     setBtnGroup();
 
     auto *forms = new QFormLayout;
@@ -219,3 +219,13 @@ void IntegrationTab::setUpFunctions() {
 
     funcsVector.push_back(&Function::function_3);
 }
+
+/*
+
+ namespace function_examle {
+    void a(void){};
+}
+typedef void(*func_ptr)(void);
+using func_ptr = void(*)(void);
+
+ */

@@ -21,7 +21,7 @@ LAbsTabs::LAbsTabs(QWidget *parent) : QDialog(parent) {
     tabWidget->addTab(integrationTab, tr("Интегрирование"));
     tabWidget->addTab(interpolationTab, tr("Интерполирование"));
     tabWidget->addTab(odeTab, tr("ОДУ"));
-    tabWidget->setCurrentWidget(integrationTab);
+    tabWidget->setCurrentWidget(interpolationTab);
 
     auto *mainLayout = new QVBoxLayout;
 

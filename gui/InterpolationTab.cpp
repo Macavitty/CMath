@@ -6,8 +6,12 @@
 
 InterpolationTab::InterpolationTab(QWidget *parent) : QWidget(parent) {
     auto *mainLayout = new QVBoxLayout;
-    auto *label = new QLabel("Sorry, this tab is under development");
-    label->setAlignment(Qt::AlignCenter);
-    mainLayout->addWidget(label);
+    //mainLayout->addWidget(label);
+    scene = new QGraphicsScene;
+    scene->setBackgroundBrush(Qt::red);
+    
+    graphicsView = new QGraphicsView(scene);
+    graphicsView->setFixedSize(1000, 800);
+    mainLayout->addWidget(graphicsView);
     setLayout(mainLayout);
 }

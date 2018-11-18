@@ -7,13 +7,19 @@
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QLabel>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtCharts>
+
+// using namespace QtCharts;
+
 
 class InterpolationTab : public QWidget {
 Q_OBJECT
 public:
     explicit InterpolationTab(QWidget *parent = nullptr);
-
+    QGraphicsScene *scene;
+    QGraphicsView *graphicsView;
 };
 
 

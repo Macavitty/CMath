@@ -25,6 +25,7 @@
 #include <QtWidgets/QToolTip>
 #include "algos/IntegrationSolver.h"
 #include "helpers/Function.h"
+#include <memory>
 
 class IntegrationTab : public QWidget {
 Q_OBJECT
@@ -41,6 +42,7 @@ private slots:
     void solve();
 
 private:
+    std::unique_ptr<QGridLayout> _contentLayout;
     QGridLayout *contentLayout;
     QRadioButton *funcBtn_0, *funcBtn_1, *funcBtn_2, *funcBtn_3;
     QTextEdit *answerField;
