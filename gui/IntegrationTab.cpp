@@ -221,7 +221,6 @@ void IntegrationTab::setUpFunctions() {
 }
 
 /*
-
  namespace function_examle {
     void a(void){};
 }

@@ -1,6 +1,3 @@
-# Created by and for Qt Creator This file was created for editing the project sources only.
-# You may attempt to use it for building too, by modifying this file here.
-
 #TARGET = CompMath
 
 QT += charts
@@ -12,7 +9,7 @@ HEADERS = \
    $$PWD/algos/ODESolver.h \
    $$PWD/gui/IntegrationTab.h \
    $$PWD/gui/InterpolationTab.h \
-   $$PWD/gui/LAbsTabs.h \
+   $$PWD/gui/LabsTabs.h \
    $$PWD/gui/LinearSystemTab.h \
    $$PWD/gui/ODETab.h \
    $$PWD/helpers/Function.h
@@ -24,7 +21,7 @@ SOURCES = \
    $$PWD/algos/ODESolver.cpp \
    $$PWD/gui/IntegrationTab.cpp \
    $$PWD/gui/InterpolationTab.cpp \
-   $$PWD/gui/LAbsTabs.cpp \
+   $$PWD/gui/LabsTabs.cpp \
    $$PWD/gui/LinearSystemTab.cpp \
    $$PWD/gui/ODETab.cpp \
    $$PWD/helpers/Function.cpp \
@@ -36,9 +33,8 @@ INCLUDEPATH = \
     $$PWD/gui/img \
     $$PWD/gui/ico \
     $$PWD/helpers
-CONFIG += qt
 
-#DEFINES = 
+CONFIG += qt 
 
 DISTFILES +=
 

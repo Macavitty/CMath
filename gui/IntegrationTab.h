@@ -34,7 +34,7 @@ public:
 
 private slots:
 
-    void unsetErrPres(); // no better solution was found , so TODO
+    void unsetErrPres();
     void unsetErrLow();
 
     void unsetErrUpp();
