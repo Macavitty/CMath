@@ -1,0 +1,11 @@
+
+#ifndef COMPMATH_APPROXIMATIONSOLVER_H
+#define COMPMATH_APPROXIMATIONSOLVER_H
+
+
+class ApproximationSolver {
+
+};
+
+
+#endif //COMPMATH_APPROXIMATIONSOLVER_H

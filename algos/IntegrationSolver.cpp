@@ -7,10 +7,10 @@
 
 using namespace std;
 
-int n; // as the number of partitions is unknown, we can take any (5 in our case)
-double h; // step
-double I2n, In;
-const int M = 10000000; // max number of partitions
+static int n; // as the number of partitions is unknown, we can take any (5 in our case)
+static double h; // step
+static double I2n, In;
+static const int M = 10000000; // max number of partitions
 
 bool compute(double upper, double lower, double eps,
              double (Function::* func)(double), Function &funcObj) {

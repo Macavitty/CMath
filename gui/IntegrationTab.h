@@ -26,6 +26,7 @@
 #include "algos/IntegrationSolver.h"
 #include "helpers/Function.h"
 #include <memory>
+#include <cmath>
 
 class IntegrationTab : public QWidget {
 Q_OBJECT

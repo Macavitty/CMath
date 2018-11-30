@@ -9,19 +9,19 @@
 #include <QtCore/QFile>
 #include <QtWidgets/QMessageBox>
 #include <QtCore/QDir>
-#include "LAbsTabs.h"
+#include "LabsTabs.h"
 
 LAbsTabs::LAbsTabs(QWidget *parent) : QDialog(parent) {
     tabWidget = new QTabWidget;
     linearSystemTab = new LinearSystemTab;
     integrationTab = new IntegrationTab;
-    interpolationTab = new InterpolationTab;
+    approximationTab = new ApproximationTab;
     odeTab = new ODETab;
     tabWidget->addTab(linearSystemTab, tr("СЛАУ"));
     tabWidget->addTab(integrationTab, tr("Интегрирование"));
-    tabWidget->addTab(interpolationTab, tr("Интерполирование"));
+    tabWidget->addTab(approximationTab, tr("Аппроксимация"));
     tabWidget->addTab(odeTab, tr("ОДУ"));
-    tabWidget->setCurrentWidget(interpolationTab);
+    tabWidget->setCurrentWidget(approximationTab);
 
     auto *mainLayout = new QVBoxLayout;
 
@@ -35,11 +35,11 @@ LAbsTabs::LAbsTabs(QWidget *parent) : QDialog(parent) {
     QLabel *header = new QLabel("\u2a33 \u2a33 \u2a33\n"),
             *content = new QLabel("\n\tПриветствую!\n\n\tДанная программа пилится в рамках "
                                   "лабораторных работ\n\tпо дисциплине \u00abВычислительная математика\u00bb "
-                                  "\n\t( ИТМО, (уже не)кафедра ВТ, 2 курс )\n\tДелает ст. Прилуцкая Таня\n\n\t"
+                                  "\n\t( ИТМО, (уже не)кафедра ВТ, 2 курс ).\n\tДелает ст. Прилуцкая Таня.\n\n\t"
                                   "Что реализовано и будет реализованно:\n\n\t"
                                   "\u16dc  Решение СЛАУ методом Гаусса-Зейделя\n\t"
                                   "\u16dc  Интергирование методом трапеций\n\t"
-                                  "\u16dc  Приближение функций (ждём)\n\t"
+                                  "\u16dc  Аппроксимация функций (ждём)\n\t"
                                   "\u16dc  Решение ОДУ (тоже ждём)\n"),
                     *trueFooter = new QLabel("\tEnjoy, так сказать\n");
     header->setAlignment(Qt::AlignCenter);

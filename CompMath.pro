@@ -1,14 +1,15 @@
 #TARGET = CompMath
 
 QT += charts
+requires(qtConfig(combobox))
 
 HEADERS = \
    $$PWD/algos/IntegrationSolver.h \
-   $$PWD/algos/InterpolationSolver.h \
+   $$PWD/algos/ApproximationSolver.h \
    $$PWD/algos/LinearSystemSolver.h \
    $$PWD/algos/ODESolver.h \
    $$PWD/gui/IntegrationTab.h \
-   $$PWD/gui/InterpolationTab.h \
+   $$PWD/gui/ApproximationTab.h \
    $$PWD/gui/LabsTabs.h \
    $$PWD/gui/LinearSystemTab.h \
    $$PWD/gui/ODETab.h \
@@ -16,11 +17,11 @@ HEADERS = \
 
 SOURCES = \
    $$PWD/algos/IntegrationSolver.cpp \
-   $$PWD/algos/InterpolationSolver.cpp \
+   $$PWD/algos/ApproximationSolver.cpp \
    $$PWD/algos/LinearSystemSolver.cpp \
    $$PWD/algos/ODESolver.cpp \
    $$PWD/gui/IntegrationTab.cpp \
-   $$PWD/gui/InterpolationTab.cpp \
+   $$PWD/gui/ApproximationTab.cpp \
    $$PWD/gui/LabsTabs.cpp \
    $$PWD/gui/LinearSystemTab.cpp \
    $$PWD/gui/ODETab.cpp \

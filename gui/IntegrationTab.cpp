@@ -94,7 +94,7 @@ void IntegrationTab::tuneAswField() {
 
 void IntegrationTab::setFiltLayout() {
 
-    btnGroup = new QButtonGroup{};
+    btnGroup = new QButtonGroup;
     setBtnGroup();
 
     auto *forms = new QFormLayout;
@@ -140,17 +140,22 @@ void IntegrationTab::solve() {
     clearAnswerField();
     if (checkInput()) {
         Function fObj;
+        // long start_time =  clock();
         if (compute(uBoundField->text().toDouble(),
                     lBoundField->text().toDouble(),
                     precisionField->text().replace(",", ".").toDouble(),
                     funcsVector.at(btnGroup->checkedId()),
-                    fObj))
+                    fObj)){
+            // long end_time = clock();
+            // long search_time = end_time - start_time;
+
             answerField->append("Значение интеграла: "
                                 + QString::number(getAnswIntegr(), 'g', 8)
                                 + "\n\nКоличество разбиений: "
                                 + QString::number(getPartsNumber())
                                 + "\n\nПолученная порешность: "
                                 + QString::number(getPrecision(), 'g', 4));
+        }
         else
             answerField->append("Данная функция не является непрерывной на ["
                                 + QString::number(lBoundField->text().toDouble())

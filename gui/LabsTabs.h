@@ -12,7 +12,7 @@
 #include <QDoubleValidator>
 #include "LinearSystemTab.h"
 #include "IntegrationTab.h"
-#include "InterpolationTab.h"
+#include "ApproximationTab.h"
 #include "ODETab.h"
 
 class QTabWidget;
@@ -28,7 +28,7 @@ private slots:
 private:
     LinearSystemTab *linearSystemTab;
     IntegrationTab *integrationTab;
-    InterpolationTab *interpolationTab;
+    ApproximationTab *approximationTab;
     ODETab *odeTab;
     QTabWidget *tabWidget;
     QMenu *simpleMenu;

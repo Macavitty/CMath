@@ -1,6 +1,6 @@
 #include <QtWidgets/QApplication>
 #include <QMainWindow>
-#include "gui/LAbsTabs.h"
+#include "gui/LabsTabs.h"
 
 int main(int argc, char *argv[]) {
 
