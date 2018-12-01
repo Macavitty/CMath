@@ -8,6 +8,12 @@ ApproximationTab::ApproximationTab(QWidget *parent) : QWidget(parent) {
     auto *btnGroupBox = new QGroupBox;
     btnGroupBox->setLayout(btnArea);
 
+    doubleValidator = new QDoubleValidator;
+    doubleValidator->setNotation(QDoubleValidator::ScientificNotation);
+
+
+    //QSignalMapper *mapper = new QSignalMapper(this);
+
     // vars for plot
     QChart *m_chart = new QChart();
     QChartView *chartView = new QChartView(m_chart);
@@ -23,13 +29,21 @@ ApproximationTab::ApproximationTab(QWidget *parent) : QWidget(parent) {
     setFuncArea(btnGroup, funcLayout);
 
     // vars for table
-    QTableWidget *table = new  QTableWidget(9, 2);
-    setTableArea(table);
+    table = new  QTableWidget();
+    setTableArea();
 
     // buttons
     QPushButton *addDotBtn = new QPushButton("Добавить точку");
     QPushButton *rmDotBtn = new QPushButton("Удалить точку");
     QPushButton *solveBtn = new QPushButton("ВЖУХ");
+
+
+    connect(solveBtn, SIGNAL(clicked()), this, SLOT(solve()));
+    connect(rmDotBtn, SIGNAL(clicked()), this, SLOT(rmDot()));
+    connect(addDotBtn, SIGNAL(clicked()), this, SLOT(addDot()));
+    //connect(addDotBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+    //connect(mapper, SLOT(mapped(QWidget *)), this, SLOT(addDot(QWidget*)));
+
     prettyBtn(solveBtn, 250, 30, "#115404", "#C3A8A8");
     prettyBtn(rmDotBtn, 202, 30, "#C3A8A8");
     prettyBtn(addDotBtn, 202, 30, "#C3A8A8");
@@ -144,10 +158,11 @@ void ApproximationTab::setFuncArea(QButtonGroup *btnGroup, QVBoxLayout *funcLayo
      funcLayout->addWidget(funcBtn_2, 0, Qt::AlignTop);
 }
 
-void ApproximationTab::setTableArea(QTableWidget *table){
-    table->verticalHeader()->hide();
-    table->setMaximumWidth(202);
-    table->setMinimumWidth(202);
+void ApproximationTab::setTableArea(){
+    table->setColumnCount(2);
+
+    table->setMaximumWidth(210);
+    table->setMinimumWidth(210);
     table->setMaximumHeight(300);
     table->setMinimumHeight(300);
 
@@ -155,7 +170,9 @@ void ApproximationTab::setTableArea(QTableWidget *table){
     QTableWidgetItem *headerY = new QTableWidgetItem("Y");
     table->setHorizontalHeaderItem(0, headerX);
     table->setHorizontalHeaderItem(1, headerY);
-    table->horizontalHeader()->setDefaultSectionSize(100);
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    addDot(7);
+    //table->horizontalHeader()->setDefaultSectionSize(94);
 }
 
 void ApproximationTab::prettyBtn(QPushButton* btn, int w, int h, QString color, QString back){
@@ -179,14 +196,46 @@ void ApproximationTab::prettyCoeff(QTextEdit* field, int w, int h){
     field->setMinimumSize(w, h);
 }
 
+void ApproximationTab::rmDot(){
+    QModelIndexList rows = table->selectionModel()->selectedRows();
+    int total = table->rowCount();
+    int selected = rows.size();
+    if (selected == 0){
+        showErr("Выделите хотя бы одну строку", table);
+    }
+    else if (total - selected < 3){
+        showErr("Для аппроксимации необходимо\n хотя бы три точки", table);
+    }
+    else {
+        while (!rows.empty())
+        {
+            table->removeRow(rows[0].row());
+            rows = table->selectionModel()->selectedRows();
+        }
+    }
+}
 
+void ApproximationTab::addDot(){
+    table->insertRow( table->rowCount() );
+    QLineEdit *x = new QLineEdit(table);
+    QLineEdit *y = new QLineEdit(table);
+    x->setValidator(doubleValidator);
+    y->setValidator(doubleValidator);
+    table->setCellWidget(table->rowCount()-1, 0, x);
+    table->setCellWidget(table->rowCount()-1, 1, y);
+}
 
+void ApproximationTab::addDot(int num){
+   for (auto i = 0; i < num; i++) addDot();
+}
 
+void ApproximationTab::solve(){
 
+}
 
-
-
-
+void ApproximationTab::showErr(QString msg, QWidget *w) {
+    QToolTip::showText(w->pos()*60/7, msg, w);
+}
 
 
 
