@@ -11,17 +11,30 @@ ApproximationTab::ApproximationTab(QWidget *parent) : QWidget(parent) {
     doubleValidator = new QDoubleValidator;
     doubleValidator->setNotation(QDoubleValidator::ScientificNotation);
 
+    columnX = new QList<QLineEdit*>;
+    columnY = new QList<QLineEdit*>;
+    for (int i = 0 ; i < 20; i++){
+        QLineEdit *x = new QLineEdit;
+        QLineEdit *y = new QLineEdit;
+        columnX->append(x);
+        columnY->append(y);
+        x->setMaxLength(MAX_EDIT_CHARS);
+        y->setMaxLength(MAX_EDIT_CHARS);
+        x->setValidator(doubleValidator);
+        y->setValidator(doubleValidator);
+    }
 
     //QSignalMapper *mapper = new QSignalMapper(this);
 
     // vars for plot
-    QChart *m_chart = new QChart();
-    QChartView *chartView = new QChartView(m_chart);
-    QLineSeries *m_serBefore = new QLineSeries();
-    QLineSeries *m_serAfter = new QLineSeries();
+    chart = new QChart();
+    QChartView *chartView = new QChartView(chart);
+    serBefore = new QLineSeries();
+    serAfter = new QLineSeries();
+    serInput = new QScatterSeries();
     QValueAxis *axisY = new QValueAxis;
     QValueAxis *axisX = new QValueAxis;
-    setPlotArea(m_chart,chartView, m_serBefore, m_serAfter, axisX, axisY);
+    setPlotArea(chart, chartView, axisX, axisY);
 
     // vars for appr func
     QButtonGroup *btnGroup = new QButtonGroup;
@@ -74,14 +87,18 @@ ApproximationTab::ApproximationTab(QWidget *parent) : QWidget(parent) {
     setLayout(mainLayout);
 }
 
-void ApproximationTab::setPlotArea(QChart *chart, QChartView *view, QLineSeries *sBefore, QLineSeries *sAfter, QValueAxis *x, QValueAxis *y){
+void ApproximationTab::setPlotArea(QChart *chart, QChartView *view, QValueAxis *x, QValueAxis *y){
     chart->setTitle("Very nise plot");
 
-    sBefore->setName("func");
-    sAfter->setName("another func");
+    serBefore->setName("func");
+    serAfter->setName("another func");
+    serInput->setName("набор заданных изначально точек");
+    serInput->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+    serInput->setMarkerSize(11.0);
     // add series to chart
-    chart->addSeries(sBefore);
-    chart->addSeries(sAfter);
+    chart->addSeries(serBefore);
+    chart->addSeries(serAfter);
+    chart->addSeries(serInput);
 
     // legend settings
     chart->legend()->setAlignment(Qt::AlignBottom);
@@ -91,15 +108,17 @@ void ApproximationTab::setPlotArea(QChart *chart, QChartView *view, QLineSeries 
     x->setLabelFormat("%.2f");
     x->setTitleText("X");
     chart->addAxis(x, Qt::AlignBottom);
-    sBefore->attachAxis(x);
-    sAfter->attachAxis(x);
+    serBefore->attachAxis(x);
+    serAfter->attachAxis(x);
+    serInput->attachAxis(x);
 
     // y axis
     y->setLabelFormat("%.2f");
     y->setTitleText("Y");
     chart->addAxis(y, Qt::AlignLeft);
-    sBefore->attachAxis(y);
-    sAfter->attachAxis(y);
+    serBefore->attachAxis(y);
+    serAfter->attachAxis(y);
+    serInput->attachAxis(y);
 
     view->setFixedHeight(1000);
     view->setFixedWidth(1000);
@@ -207,8 +226,7 @@ void ApproximationTab::rmDot(){
         showErr("Для аппроксимации необходимо\n хотя бы три точки", table);
     }
     else {
-        while (!rows.empty())
-        {
+        while (!rows.empty()){
             table->removeRow(rows[0].row());
             rows = table->selectionModel()->selectedRows();
         }
@@ -216,13 +234,19 @@ void ApproximationTab::rmDot(){
 }
 
 void ApproximationTab::addDot(){
-    table->insertRow( table->rowCount() );
-    QLineEdit *x = new QLineEdit(table);
-    QLineEdit *y = new QLineEdit(table);
-    x->setValidator(doubleValidator);
-    y->setValidator(doubleValidator);
-    table->setCellWidget(table->rowCount()-1, 0, x);
-    table->setCellWidget(table->rowCount()-1, 1, y);
+    if (table->rowCount() == 20){
+        showErr("Пожалуй хватит", table);
+    }
+    else {
+        int rowIndx = table->rowCount();
+        table->insertRow(rowIndx);
+        QLineEdit *x = columnX->takeAt(rowIndx);
+        QLineEdit *y = columnY->takeAt(rowIndx);
+        x->setText("");
+        y->setText("");
+        table->setCellWidget(rowIndx, 0, x);
+        table->setCellWidget(rowIndx, 1, y);
+    }
 }
 
 void ApproximationTab::addDot(int num){
@@ -230,16 +254,67 @@ void ApproximationTab::addDot(int num){
 }
 
 void ApproximationTab::solve(){
-
+    if (!hasEmptyCells()){
+        // check if have same dots!
+        showErr("Заполните все ячейки", table);
+    }
+    else {
+        redrawPlot();
+    }
 }
 
 void ApproximationTab::showErr(QString msg, QWidget *w) {
     QToolTip::showText(w->pos()*60/7, msg, w);
 }
 
+bool ApproximationTab::hasEmptyCells(){
+    for (auto i = 0; i < table->rowCount(); i++){
+        /* BEWARE somehow columnX->takeAt(i) doesn`t work */
+        if (((QLineEdit*)table
+             ->cellWidget(i, 0))
+                ->text()
+                .replace(" ", "") == "" ||
+                ((QLineEdit*)table
+                             ->cellWidget(i, 1))
+                                ->text()
+                                .replace(" ", "") == "") {
+           return false;
+        }
+    }
 
+    return true;
+}
 
+void ApproximationTab::redrawPlot(){
 
+    serInput->clear();
+    serBefore->clear();
+    serAfter->clear();
+
+    double maxX = pow(10, MAX_EDIT_CHARS + 1) * (-1),
+           maxY = pow(10, MAX_EDIT_CHARS + 1) * (-1),
+           minX = pow(10, MAX_EDIT_CHARS + 1),
+           minY = pow(10, MAX_EDIT_CHARS + 1);
+    for (auto i = 0; i < table->rowCount(); i++){
+        double x = ((QLineEdit*)table->cellWidget(i, 0))->text().toDouble();
+        double y = ((QLineEdit*)table->cellWidget(i, 1))->text().toDouble();
+        maxX = max(x, maxX);
+        maxY = max(y, maxY);
+        minX = min(x, minX);
+        minY = min(y, minY);
+        serInput->append(x, y);
+    }
+    int step = (int)(maxX - minX)/2 <= 18 ? (int)(maxX - minX) : (int)(maxX - minX)/2;
+    scaleAxes(chart->axisX(), minX-1, maxX+1, step);
+    step = (int)(maxY - minY) <= 18 ? (int)(maxY - minY) : (int)(maxY - minY)/2;
+    scaleAxes(chart->axisY(), minY-1, maxY+1, step);
+
+}
+void ApproximationTab::scaleAxes(QAbstractAxis* a, double min, double max, int step){
+    a->setMin(min);
+    a->setMax(max);
+    ((QValueAxis*)a)->setTickCount(step);
+}
 
 
 
