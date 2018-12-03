@@ -8,10 +8,10 @@
 #include <vector>
 #include <cmath>
 
-bool validateSystem(long double **A, long double *B, int n);
-bool compute(long double **A, long double *B, int n, double e);
+bool validateSystem(double **A, double *B, int n);
+bool compute(double **A, double *B, int n, double e);
 bool isDone(int n, double e);
-long double * getAnswSLAY();
-long double * getPrecisions();
+double * getAnswSLAY();
+double * getPrecisions();
 int getIterationsNumber();
 #endif //COMPMATH_LINEARSYSTEMSOLVER_H

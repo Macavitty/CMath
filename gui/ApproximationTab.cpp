@@ -36,7 +36,7 @@ ApproximationTab::ApproximationTab(QWidget *parent) : QWidget(parent) {
     setPlotArea(chart, chartView, axisX, axisY);
 
     // vars for appr func
-    QButtonGroup *btnGroup = new QButtonGroup;
+    btnGroup = new QButtonGroup;
     QVBoxLayout *funcLayout = new QVBoxLayout;
     setFuncArea(btnGroup, funcLayout);
 
@@ -61,7 +61,7 @@ ApproximationTab::ApproximationTab(QWidget *parent) : QWidget(parent) {
     prettyBtn(addDotBtn, 202, 30, "#C3A8A8");
 
     // coefficients
-    QTextEdit *coeffField = new QTextEdit;
+    coeffField = new QTextEdit;
     prettyCoeff(coeffField, 450, 280);
 
     // building
@@ -73,7 +73,7 @@ ApproximationTab::ApproximationTab(QWidget *parent) : QWidget(parent) {
     paramLayout->addLayout(funcLayout);
     paramLayout->addWidget(table, 0, Qt::AlignTop);
 
-    leftLayout->addWidget(new QLabel("Выберите аппроксимирующую функцию и задайте минимум 3 точки:"), 0, Qt::AlignCenter);
+    leftLayout->addWidget(new QLabel("Выберите общий вид формулы и задайте минимум 3 точки:"), 0, Qt::AlignCenter);
     leftLayout->addLayout(paramLayout);
     leftLayout->addWidget(btnGroupBox, 0, Qt::AlignRight);
     leftLayout->addWidget(solveBtn, 0, Qt::AlignCenter);
@@ -89,11 +89,11 @@ ApproximationTab::ApproximationTab(QWidget *parent) : QWidget(parent) {
 void ApproximationTab::setPlotArea(QChart *chart, QChartView *view, QValueAxis *x, QValueAxis *y){
     chart->setTitle("Very nise plot");
 
-    serBefore->setName("func");
-    serAfter->setName("another func");
-    serInput->setName("набор заданных изначально точек");
+    serBefore->setName("аппроксимирующая функция");
+    serAfter->setName("аппроксимирующая функция (без наиболее отклоняющейся точки)");
+    serInput->setName("заданые точки");
     serInput->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-    serInput->setMarkerSize(11.0);
+    serInput->setMarkerSize(9.0);
     // add series to chart
     chart->addSeries(serBefore);
     chart->addSeries(serAfter);
@@ -193,7 +193,9 @@ void ApproximationTab::setTableArea(){
     //table->horizontalHeader()->setDefaultSectionSize(94);
 }
 
-void ApproximationTab::prettyBtn(QPushButton* btn, int w, int h, QString color, QString back){
+void ApproximationTab::prettyBtn(QPushButton* btn,
+                                 int w, int h, QString color,
+                                 QString back){
     btn->setStyleSheet("color : " + color + "; background :" + back);
     btn->setMaximumWidth(w);
     btn->setMinimumWidth(w);
@@ -208,10 +210,11 @@ void ApproximationTab::prettyCoeff(QTextEdit* field, int w, int h){
     field->setStyleSheet("background : white; "
                                "border: 1px solid #C3A8A8; "
                                "border-radius: 7px; "
-                               "font: 15px; "
+                               "font: 12px; "
                                "color: #181322");
     field->setFixedSize(w, h);
     field->setMinimumSize(w, h);
+    field->setAlignment(Qt::AlignCenter);
 }
 
 void ApproximationTab::rmDot(){
@@ -238,13 +241,13 @@ void ApproximationTab::addDot(){
     }
     else {
         int rowIndx = table->rowCount();
-        cout << "add " << rowIndx << endl;
         table->insertRow(rowIndx);
-        cout << columnX->at(rowIndx) << endl;
         columnX->replace(rowIndx, new QLineEdit);
         columnY->replace(rowIndx, new QLineEdit);
         QLineEdit *x = columnX->at(rowIndx);
         QLineEdit *y = columnY->at(rowIndx);
+        tuneCell(x);
+        tuneCell(y);
         table->setCellWidget(rowIndx, 0, x);
         table->setCellWidget(rowIndx, 1, y);
     }
@@ -255,13 +258,61 @@ void ApproximationTab::addDot(int num){
 }
 
 void ApproximationTab::solve(){
+    if (validateTable(btnGroup->checkedId())){
+        QList<QPair<double, double>> *dots = getInputDots();
+        QList<double> *coeffBefore = approximate(dots, btnGroup->checkedId());
+        // find the worst point and get rid of it
+        double maxDeviation = 0;
+        int devIndx = 0;
+        for (auto i = 0; i < dots->size(); i++){
+            double x = dots->at(i).first;
+            double dev = abs(dots->at(i).second
+                             - function(btnGroup->checkedId(),
+                                        coeffBefore->first(),
+                                        coeffBefore->at(1),
+                                        coeffBefore->last(), x));
+            if (dev > maxDeviation){
+                maxDeviation = dev;
+                devIndx = i;
+            }
+        }
+        if (maxDeviation != 0.0) dots->takeAt(devIndx);
+        QList<double> *coeffAfter = approximate(dots, btnGroup->checkedId());;
+        redrawPlot(coeffBefore, coeffAfter, btnGroup->checkedId());
+     }
+}
+bool ApproximationTab::validateTable(int func){
     if (!hasEmptyCells()){
-        // check if have same dots!
         showErr("Заполните все ячейки", table);
+        return false;
     }
-    else {
-        redrawPlot();
+    if (func == 2){
+        for (auto i = 0; i < table->rowCount(); i++){
+            if (columnX->at(i)->text().toDouble() <= 0.0 ||
+                        columnY->at(i)->text().toDouble() <= 0.0){
+                showErr("Не все точки допустимы для степенной аппроксимации", table);
+                return false;
+            }
+        }
     }
+    if (func == 3){
+        for (auto i = 0; i < table->rowCount(); i++){
+            if (columnY->at(i)->text().toDouble() <= 0.0){
+                showErr("Не все точки допустимы для экспоненциальной аппроксимации", table);
+                return false;
+            }
+        }
+    }
+    if (func  == 4){
+        for (auto i = 0; i < table->rowCount(); i++){
+            if (columnX->at(i)->text().toDouble() <= 0.0){
+                showErr("Не все точки допустимы для логарифмической аппроксимации", table);
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 void ApproximationTab::showErr(QString msg, QWidget *w) {
@@ -286,7 +337,7 @@ bool ApproximationTab::hasEmptyCells(){
     return true;
 }
 
-void ApproximationTab::redrawPlot(){ 
+void ApproximationTab::redrawPlot(QList<double>* before, QList<double>* after, int func){
 
     serInput->clear();
     serBefore->clear();
@@ -296,19 +347,34 @@ void ApproximationTab::redrawPlot(){
            maxY = pow(10, MAX_EDIT_CHARS + 1) * (-1),
            minX = pow(10, MAX_EDIT_CHARS + 1),
            minY = pow(10, MAX_EDIT_CHARS + 1);
+
+    // fill user input series
     for (auto i = 0; i < table->rowCount(); i++){
-        double x = ((QLineEdit*)table->cellWidget(i, 0))->text().toDouble();
-        double y = ((QLineEdit*)table->cellWidget(i, 1))->text().toDouble();
+        double x = ((QLineEdit*)table->cellWidget(i, 0))->text().replace(",", ".").toDouble();
+        double y = ((QLineEdit*)table->cellWidget(i, 1))->text().replace(",", ".").toDouble();
         maxX = max(x, maxX);
         maxY = max(y, maxY);
         minX = min(x, minX);
         minY = min(y, minY);
         serInput->append(x, y);
     }
-    int step = (int)(maxX - minX)/2 <= 18 ? (int)(maxX - minX) : (int)(maxX - minX)/2;
-    scaleAxes(chart->axisX(), minX-1, maxX+1, step);
-    step = (int)(maxY - minY) <= 18 ? (int)(maxY - minY) : (int)(maxY - minY)/2;
-    scaleAxes(chart->axisY(), minY-1, maxY+1, step);
+    int steps = 420;
+    double step = (maxX - minX)/steps;
+    minX -= step*10;
+    maxX += step*10;
+    minY -= step*10;
+    maxY += step*10;
+    fillCoeffArea(func, before, after);
+    // fill appr function series
+    double i = minX;
+    while (i < maxX) {
+        serBefore->append(i, function(func, before->first(), before->at(1), before->last(), i));
+        serAfter->append(i, function(func, after->first(), after->at(1), after->last(), i));
+        i += step;
+    }
+    int tick = 20;
+    scaleAxes(chart->axisX(), minX-2, maxX+2, tick);
+    scaleAxes(chart->axisY(), minY-2, maxY+2, tick);
 
 }
 
@@ -325,9 +391,60 @@ void ApproximationTab::tuneCell(QLineEdit *c){
     c->setValidator(doubleValidator);
 }
 
+QList<QPair<double, double>>* ApproximationTab::getInputDots(){
+    auto list = new QList<QPair<double, double>>;
+    for (auto i = 0; i < table->rowCount(); i++){
+        double x = ((QLineEdit*)table->cellWidget(i, 0))->text().replace(",", ".").toDouble();
+        double y = ((QLineEdit*)table->cellWidget(i, 1))->text().replace(",", ".").toDouble();
+        QPair<double, double> p;
+        p.first = x;
+        p.second = y;
+        list->append(p);
+    }
+    return list;
+}
 
+void ApproximationTab::fillCoeffArea(int func, QList<double>* before, QList<double>* after){
+    coeffField->setAlignment(Qt::AlignCenter);
+    if (func != 1)
+        coeffField->setText("\n\n\n\nДо исключения точки с наибольшим отклонением:\na = "
+                        + QString::number(before->first()) + "\nb = "
+                        + QString::number(before->last())
+                        + "\n\nПосле:\na = "
+                        + QString::number(after->first()) + "\nb = "
+                        + QString::number(after->last()));
+    else
+        coeffField->setText("\n\n\n\nДо исключения точки с наибольшим отклонением:\n\na = "
+                        + QString::number(before->first()) + "\nb = "
+                        + QString::number(before->at(1)) + "\nc = "
+                        + QString::number(before->last())
+                        + "\n\nПосле:\na = "
+                        + QString::number(after->first()) + "\nb = "
+                        + QString::number(after->at(1)) + "\nc = "
+                        + QString::number(before->last()));
 
+}
 
+double ApproximationTab::function(int f, double a, double b, double c, double x){
+    switch (f) {
+    case 1:
+        return x*x*a + x*b + c;
+        break;
+    case 2:
+        return a*copysign(pow(fabs(x), b), x);
+        break;
+    case 3:
+        return a*exp(x*b);
+        break;
+    case 4:
+        return a + log(x)*b;
+        break;
+    default:
+        return x*a + b;
+    }
+}
 
-
+double ApproximationTab::function(int f, double a, double b, double x){
+    function(f, a, b, 0, x);
+}
 

@@ -1,7 +1,3 @@
-//
-// Created by tania on 20.10.18.
-//
-
 #ifndef COMPMATH_FUNCTION_H
 #define COMPMATH_FUNCTION_H
 

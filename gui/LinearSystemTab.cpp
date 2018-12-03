@@ -80,8 +80,8 @@ void LinearSystemTab::setButtons() {
 void LinearSystemTab::solve() {
     int n = numberSlider->value();
     double e = precisionField->text().replace(",", ".").toDouble();
-    auto **A = new long double *[n], *B = new long double[n];
-    for (int i = 0; i < n; i++) A[i] = new long double[n];
+    auto **A = new double *[n], *B = new double[n];
+    for (int i = 0; i < n; i++) A[i] = new double[n];
     for (auto i = 0; i < n; i++) {
         B[i] = matrix[i][n + 1]->text().replace(",", ".").toDouble();
         for (auto j = 0; j < n; j++) {

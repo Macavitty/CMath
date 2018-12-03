@@ -10,13 +10,13 @@ using namespace std;
 
 const int M = 10000; // max number of iterations
 int k; // number of iterations
-long double *Xnext, // (k+1)th  approximation
+double *Xnext, // (k+1)th  approximation
         *Xcurrent, // kth approximation
         *P; // accuracies
 
-bool compute(long double **A, long double *B, int n, double e) {
-    Xnext = new long double[n];
-    Xcurrent = new long double[n];
+bool compute(double **A, double *B, int n, double e) {
+    Xnext = new double[n];
+    Xcurrent = new double[n];
     if (validateSystem(A, B, n)) {
         // 0th approximation
         for (int i = 0; i < n; i++) {
@@ -40,7 +40,7 @@ bool compute(long double **A, long double *B, int n, double e) {
             }
             k++;
         }
-        P = new long double[n];
+        P = new double[n];
         for (auto i = 0; i < n; i++) {
             P[i] = abs((double) (Xnext[i] - Xcurrent[i]));
         }
@@ -53,14 +53,14 @@ bool compute(long double **A, long double *B, int n, double e) {
 }
 
 bool isDone(int n, double e) {
-    long double precision = 0;
+    double precision = 0;
     for (int i = 0; i < n; i++)
         precision = max(precision, abs(Xnext[i] - Xcurrent[i]));
     return e >= precision;
 }
 
-bool validateSystem(long double **A, long double *B, int n) {
-    long double summ = 0;
+bool validateSystem(double **A, double *B, int n) {
+    double summ = 0;
     bool maxElem[n][n]; // this matrix indicates potential diagonal elements
     for (int i = 0; i < n; i++)
         for (int j = 0; j < n; j++) maxElem[i][j] = false;
@@ -75,8 +75,8 @@ bool validateSystem(long double **A, long double *B, int n) {
         }
         summ = 0;
     }
-    long double tmpA[n][n];
-    long double tmpB[n];
+    double tmpA[n][n];
+    double tmpB[n];
     for (int i = 0; i < n; i++) { // for each row find right diagonal element
         bool is = false;
         for (int j = 0; j < n; j++) {
@@ -99,11 +99,11 @@ bool validateSystem(long double **A, long double *B, int n) {
     return true;
 }
 
-long double *getAnswSLAY() {
+double *getAnswSLAY() {
     return Xnext;
 }
 
-long double *getPrecisions() {
+double *getPrecisions() {
     return P;
 }
 

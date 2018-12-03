@@ -35,6 +35,8 @@ private:
     QScatterSeries *serInput;
     QList<QLineEdit*> *columnX;
     QList<QLineEdit*> *columnY;
+    QButtonGroup *btnGroup;
+    QTextEdit *coeffField;
     unique_ptr<QGridLayout> _contentLayout;
     void setPlotArea(QChart*, QChartView*, QValueAxis*, QValueAxis*);
     void setFuncArea(QButtonGroup*, QVBoxLayout*);
@@ -45,10 +47,14 @@ private:
     void showErr(QString, QWidget*);
     void addDot(int);
     bool hasEmptyCells();
-    void redrawPlot();
+    void redrawPlot(QList<double>* before, QList<double>* after, int);
     void scaleAxes(QAbstractAxis*, double min, double max, int step);
     void tuneCell(QLineEdit*);
+    QList<QPair<double, double>>* getInputDots();
+    void fillCoeffArea(int, QList<double>* before, QList<double>* after);
+    bool validateTable(int);
+    double function(int f, double a, double b, double x);
+    double function(int f, double a, double b, double c, double x);
 };
-
 
 #endif //COMPMATH_APPROXIMATIONTAB_H

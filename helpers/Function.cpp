@@ -1,7 +1,3 @@
-//
-// Created by tania on 20.10.18.
-//
-
 #include "Function.h"
 
 // right now this class is nothing more than a functions container
