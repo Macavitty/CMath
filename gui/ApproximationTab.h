@@ -33,6 +33,7 @@ private:
     QLineSeries *serBefore;
     QLineSeries *serAfter;
     QScatterSeries *serInput;
+    QScatterSeries *serDeviation;
     QList<QLineEdit*> *columnX;
     QList<QLineEdit*> *columnY;
     QButtonGroup *btnGroup;

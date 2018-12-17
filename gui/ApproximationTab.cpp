@@ -31,6 +31,7 @@ ApproximationTab::ApproximationTab(QWidget *parent) : QWidget(parent) {
     serBefore = new QLineSeries();
     serAfter = new QLineSeries();
     serInput = new QScatterSeries();
+    serDeviation = new QScatterSeries();
     QValueAxis *axisY = new QValueAxis;
     QValueAxis *axisX = new QValueAxis;
     setPlotArea(chart, chartView, axisX, axisY);
@@ -47,7 +48,7 @@ ApproximationTab::ApproximationTab(QWidget *parent) : QWidget(parent) {
     // buttons
     QPushButton *addDotBtn = new QPushButton("Добавить точку");
     QPushButton *rmDotBtn = new QPushButton("Удалить точку");
-    QPushButton *solveBtn = new QPushButton("ВЖУХ");
+    QPushButton *solveBtn = new QPushButton("Аппроксимировать");
 
 
     connect(solveBtn, SIGNAL(clicked()), this, SLOT(solve()));
@@ -87,17 +88,21 @@ ApproximationTab::ApproximationTab(QWidget *parent) : QWidget(parent) {
 }
 
 void ApproximationTab::setPlotArea(QChart *chart, QChartView *view, QValueAxis *x, QValueAxis *y){
-    chart->setTitle("Very nise plot");
+    chart->setTitle("");
 
     serBefore->setName("аппроксимирующая функция");
     serAfter->setName("аппроксимирующая функция (без наиболее отклоняющейся точки)");
     serInput->setName("заданые точки");
+    serDeviation->setName("наиболее отклоняющаяся точка");
     serInput->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     serInput->setMarkerSize(9.0);
+    serDeviation->setMarkerSize(9.0);
+    serDeviation->setColor("#ff0000");
     // add series to chart
     chart->addSeries(serBefore);
     chart->addSeries(serAfter);
     chart->addSeries(serInput);
+    chart->addSeries(serDeviation);
 
     // legend settings
     chart->legend()->setAlignment(Qt::AlignBottom);
@@ -110,6 +115,7 @@ void ApproximationTab::setPlotArea(QChart *chart, QChartView *view, QValueAxis *
     serBefore->attachAxis(x);
     serAfter->attachAxis(x);
     serInput->attachAxis(x);
+    serDeviation->attachAxis(x);
 
     // y axis
     y->setLabelFormat("%.2f");
@@ -118,6 +124,7 @@ void ApproximationTab::setPlotArea(QChart *chart, QChartView *view, QValueAxis *
     serBefore->attachAxis(y);
     serAfter->attachAxis(y);
     serInput->attachAxis(y);
+    serDeviation->attachAxis(y);
 
     view->setFixedHeight(1000);
     view->setFixedWidth(1000);
@@ -276,6 +283,8 @@ void ApproximationTab::solve(){
                 devIndx = i;
             }
         }
+        serDeviation->clear();
+        serDeviation->append(dots->at(devIndx).first, dots->at(devIndx).second);
         if (maxDeviation != 0.0) dots->takeAt(devIndx);
         QList<double> *coeffAfter = approximate(dots, btnGroup->checkedId());;
         redrawPlot(coeffBefore, coeffAfter, btnGroup->checkedId());
@@ -288,8 +297,8 @@ bool ApproximationTab::validateTable(int func){
     }
     if (func == 2){
         for (auto i = 0; i < table->rowCount(); i++){
-            if (columnX->at(i)->text().toDouble() <= 0.0 ||
-                        columnY->at(i)->text().toDouble() <= 0.0){
+            if (columnX->at(i)->text().replace(",", ".").toDouble() <= 0.0 ||
+                        columnY->at(i)->text().replace(",", ".").toDouble() <= 0.0){
                 showErr("Не все точки допустимы для степенной аппроксимации", table);
                 return false;
             }
@@ -297,7 +306,7 @@ bool ApproximationTab::validateTable(int func){
     }
     if (func == 3){
         for (auto i = 0; i < table->rowCount(); i++){
-            if (columnY->at(i)->text().toDouble() <= 0.0){
+            if (columnY->at(i)->text().replace(",", ".").toDouble() <= 0.0){
                 showErr("Не все точки допустимы для экспоненциальной аппроксимации", table);
                 return false;
             }
@@ -305,7 +314,7 @@ bool ApproximationTab::validateTable(int func){
     }
     if (func  == 4){
         for (auto i = 0; i < table->rowCount(); i++){
-            if (columnX->at(i)->text().toDouble() <= 0.0){
+            if (columnX->at(i)->text().replace(",", ".").toDouble() <= 0.0){
                 showErr("Не все точки допустимы для логарифмической аппроксимации", table);
                 return false;
             }
@@ -360,21 +369,26 @@ void ApproximationTab::redrawPlot(QList<double>* before, QList<double>* after, i
     }
     int steps = 420;
     double step = (maxX - minX)/steps;
+    double delta = maxX - minX;
+    if (delta > 100) delta = 10;
+    else if (delta < 3) delta = 0.2;
+    else delta = 1;
     minX -= step*10;
     maxX += step*10;
     minY -= step*10;
     maxY += step*10;
     fillCoeffArea(func, before, after);
     // fill appr function series
-    double i = minX;
-    while (i < maxX) {
+    double i = minX - step*10;
+    while (i < maxX + step*10) {
         serBefore->append(i, function(func, before->first(), before->at(1), before->last(), i));
         serAfter->append(i, function(func, after->first(), after->at(1), after->last(), i));
         i += step;
     }
     int tick = 20;
-    scaleAxes(chart->axisX(), minX-2, maxX+2, tick);
-    scaleAxes(chart->axisY(), minY-2, maxY+2, tick);
+
+    scaleAxes(chart->axisX(), minX-delta, maxX+delta, tick);
+    scaleAxes(chart->axisY(), minY-delta, maxY+delta, tick);
 
 }
 
@@ -410,7 +424,7 @@ void ApproximationTab::fillCoeffArea(int func, QList<double>* before, QList<doub
         coeffField->setText("\n\n\n\nДо исключения точки с наибольшим отклонением:\na = "
                         + QString::number(before->first()) + "\nb = "
                         + QString::number(before->last())
-                        + "\n\nПосле:\na = "
+                        + "\n\nПосле исключения точки с наибольшим отклонением:\na = "
                         + QString::number(after->first()) + "\nb = "
                         + QString::number(after->last()));
     else
@@ -418,7 +432,7 @@ void ApproximationTab::fillCoeffArea(int func, QList<double>* before, QList<doub
                         + QString::number(before->first()) + "\nb = "
                         + QString::number(before->at(1)) + "\nc = "
                         + QString::number(before->last())
-                        + "\n\nПосле:\na = "
+                        + "\n\nПосле исключения точки с наибольшим отклонением:\na = "
                         + QString::number(after->first()) + "\nb = "
                         + QString::number(after->at(1)) + "\nc = "
                         + QString::number(before->last()));

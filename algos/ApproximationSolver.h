@@ -17,8 +17,8 @@ QList<QPair<double, double>>* getSerAfter();
 QList<double>* apprLinear(QList<QPair<double, double>> *dots);
 QList<double>* apprLogarithm(QList<QPair<double, double>> *dots);
 QList<double>* apprQuadr(QList<QPair<double, double>> *dots);
+QList<double>* apprPower(QList<QPair<double, double>> *dots);
 QList<double>* apprExp(QList<QPair<double, double>> *dots);
-QList<double>* apprExpExp(QList<QPair<double, double>> *dots);
 double det (double, double, double, double, double, double, double, double, double);
 
 #endif //COMPMATH_APPROXIMATIONSOLVER_H

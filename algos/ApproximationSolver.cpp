@@ -6,9 +6,9 @@ QList<double>* approximate(QList<QPair<double, double>> *dots, int func){
     case 1:
         return apprQuadr(dots);
     case 2:
-        return apprExp(dots);
+        return apprPower(dots);
     case 3:
-        return apprExpExp(dots);
+        return apprExp(dots);
     case 4:
         return apprLogarithm(dots);
     default:
@@ -108,7 +108,7 @@ QList<double>* apprQuadr(QList<QPair<double, double>> *dots){
     return coeff;
 }
 
-QList<double>* apprExp(QList<QPair<double, double>> *dots){ // степенная
+QList<double>* apprPower(QList<QPair<double, double>> *dots){ // степенная
     double SX = 0, SXX = 0, SY = 0, SXY = 0, a, b;
     int n = dots->size();
     QList<double> *coeff = new QList<double>;
@@ -128,7 +128,7 @@ QList<double>* apprExp(QList<QPair<double, double>> *dots){ // степенна�
     return coeff;
 }
 
-QList<double>* apprExpExp(QList<QPair<double, double>> *dots){ // экспоненциальная
+QList<double>* apprExp(QList<QPair<double, double>> *dots){ // экспоненциальная
     double SX = 0, SXX = 0, SY = 0, SXY = 0, a, b;
     int n = dots->size();
     QList<double> *coeff = new QList<double>;
