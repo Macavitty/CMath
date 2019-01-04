@@ -8,7 +8,6 @@
 #include <QtCharts/QChartView>
 #include <memory>
 #include "algos/ApproximationSolver.h"
-#include <iostream>
 
 
 using namespace QtCharts;
@@ -26,7 +25,7 @@ private slots:
     void solve();
 
 private:
-    int MAX_EDIT_CHARS = 9;
+    const int MAX_EDIT_CHARS = 9;
     QDoubleValidator *doubleValidator;
     QChart *chart;
     QTableWidget *table;

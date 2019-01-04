@@ -60,7 +60,7 @@ void IntegrationTab::setBtnGroup() {
     /*
      * WARNING
      * don`t forget to set up working directory correctly
-     * e. g. in linux "/home/macavitty/CLionProjects/CMath"
+     * e. g. in linux "/home/macavitty/SomeProjects/CMath"
      * */
     funcBtn_0->setIcon(QIcon("gui/img/func_0.png"));
     funcBtn_1->setIcon(QIcon("gui/img/func_1.png"));

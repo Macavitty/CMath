@@ -1,19 +1,8 @@
 #include "ApproximationSolver.h"
 
-QList<double>* approximate(QList<QPair<double, double>> *dots, int func){
-    QString type;
-    switch (func){
-    case 1:
-        return apprQuadr(dots);
-    case 2:
-        return apprPower(dots);
-    case 3:
-        return apprExp(dots);
-    case 4:
-        return apprLogarithm(dots);
-    default:
-        return apprLinear(dots);
-    }
+// считает детермининант матрицы 3 на 3, коэффициенты передаются по порядку (0,0  0,1  0,2  ...  2,2)
+static double det (double a, double b, double c, double d, double e, double f, double g, double h, double i){
+    return a*e*i + b*f*g + c*d*h - c*e*g - a*f*h - b*d*i;
 }
 
 QList<double>* apprLinear(QList<QPair<double, double>> *dots){
@@ -149,6 +138,18 @@ QList<double>* apprExp(QList<QPair<double, double>> *dots){ // экспонен�
     return coeff;
 }
 
-double det (double a, double b, double c, double d, double e, double f, double g, double h, double i){
-    return a*e*i + b*f*g + c*d*h - c*e*g - a*f*h - b*d*i;
+QList<double>* approximate(QList<QPair<double, double>> *dots, int func){
+    QString type;
+    switch (func){
+    case 1:
+        return apprQuadr(dots);
+    case 2:
+        return apprPower(dots);
+    case 3:
+        return apprExp(dots);
+    case 4:
+        return apprLogarithm(dots);
+    default:
+        return apprLinear(dots);
+    }
 }

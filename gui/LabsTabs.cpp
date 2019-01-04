@@ -9,6 +9,7 @@
 #include <QtCore/QFile>
 #include <QtWidgets/QMessageBox>
 #include <QtCore/QDir>
+#include <QQuickWidget>
 #include "LabsTabs.h"
 
 LAbsTabs::LAbsTabs(QWidget *parent) : QDialog(parent) {
@@ -16,12 +17,17 @@ LAbsTabs::LAbsTabs(QWidget *parent) : QDialog(parent) {
     linearSystemTab = new LinearSystemTab;
     integrationTab = new IntegrationTab;
     approximationTab = new ApproximationTab;
+
+    /*QQuickWidget *odeTab = new QQuickWidget;
+    odeTab->setSource(QUrl::fromLocalFile("last_tab.qml"));
+    */
     odeTab = new ODETab;
+
     tabWidget->addTab(linearSystemTab, tr("СЛАУ"));
     tabWidget->addTab(integrationTab, tr("Интегрирование"));
     tabWidget->addTab(approximationTab, tr("Аппроксимация"));
     tabWidget->addTab(odeTab, tr("ОДУ"));
-    tabWidget->setCurrentWidget(approximationTab);
+    tabWidget->setCurrentWidget(odeTab);
 
     auto *mainLayout = new QVBoxLayout;
 
@@ -39,8 +45,8 @@ LAbsTabs::LAbsTabs(QWidget *parent) : QDialog(parent) {
                                   "Что реализовано и будет реализованно:\n\n\t"
                                   "\u16dc  Решение СЛАУ методом Гаусса-Зейделя\n\t"
                                   "\u16dc  Интергирование методом трапеций\n\t"
-                                  "\u16dc  Аппроксимация функций (ждём)\n\t"
-                                  "\u16dc  Решение ОДУ (тоже ждём)\n"),
+                                  "\u16dc  Аппроксимация функций мнк\n\t"
+                                  "\u16dc  Решение ОДУ методом Адамса (ждём)\n"),
                     *trueFooter = new QLabel("\tEnjoy, так сказать\n");
     header->setAlignment(Qt::AlignCenter);
     aboutLayout->addWidget(header);

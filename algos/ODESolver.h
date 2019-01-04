@@ -1,14 +1,11 @@
-//
-// Created by tania on 27.10.18.
-//
-
 #ifndef COMPMATH_ODESOLVER_H
 #define COMPMATH_ODESOLVER_H
 
+#include <QList>
+#include <QPair>
+#include <math.h>
+#include <cmath>
 
-class ODESolver {
-
-};
-
+QList<QPair<double, double>>*  odeSolve(int f, double x0, double xend, double y0, double e);
 
 #endif //COMPMATH_ODESOLVER_H

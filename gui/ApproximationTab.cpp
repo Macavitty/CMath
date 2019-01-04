@@ -21,7 +21,6 @@ ApproximationTab::ApproximationTab(QWidget *parent) : QWidget(parent) {
         tuneCell(x);
         tuneCell(y);
     }
-    cout << columnX->size() << endl;
 
     //QSignalMapper *mapper = new QSignalMapper(this);
 
@@ -443,16 +442,12 @@ double ApproximationTab::function(int f, double a, double b, double c, double x)
     switch (f) {
     case 1:
         return x*x*a + x*b + c;
-        break;
     case 2:
         return a*copysign(pow(fabs(x), b), x);
-        break;
     case 3:
         return a*exp(x*b);
-        break;
     case 4:
         return a + log(x)*b;
-        break;
     default:
         return x*a + b;
     }
