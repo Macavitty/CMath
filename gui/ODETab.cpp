@@ -21,8 +21,8 @@ static void setBtnGroup(QButtonGroup *btnGroup, QRadioButton *f0, QRadioButton *
     f0->setIcon(QIcon("gui/img/ode_linear.png"));
     f1->setIcon(QIcon("gui/img/ode_quadr.png"));
 
-    f0->setIconSize(QSize(500, 60));
-    f1->setIconSize(QSize(400, 60));
+    f0->setIconSize(QSize(300, 55));
+    f1->setIconSize(QSize(300, 55));
 
     btnGroup->addButton(f0, 0);
     btnGroup->addButton(f1, 1);
@@ -247,9 +247,8 @@ void ODETab::scaleAxes(QAbstractAxis* a, double min, double max, int step){
 }
 
 void ODETab::setPlotArea(QChart *chart, QChartView *view, QValueAxis *x, QValueAxis *y){
-    chart->setTitle("");
 
-    series->setName("аппроксимирующая функция");
+    series->setName("искомая функция");
 
     // add series to chart
     chart->addSeries(series);

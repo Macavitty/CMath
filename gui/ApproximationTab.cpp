@@ -148,11 +148,11 @@ void ApproximationTab::setFuncArea(QButtonGroup *btnGroup, QVBoxLayout *funcLayo
      funcBtn_3->setStyleSheet("color: #181322");
      funcBtn_4->setStyleSheet("color: #181322");
 
-     funcBtn_0->setIcon(QIcon("gui/img/linear.png"));
-     funcBtn_1->setIcon(QIcon("gui/img/quadr.png"));
-     funcBtn_2->setIcon(QIcon("gui/img/expon.png"));
-     funcBtn_3->setIcon(QIcon("gui/img/expon_exp.png"));
-     funcBtn_4->setIcon(QIcon("gui/img/ln.png"));
+     funcBtn_0->setIcon(QIcon("gui/img/approx_linear.png"));
+     funcBtn_1->setIcon(QIcon("gui/img/approx_quadr.png"));
+     funcBtn_2->setIcon(QIcon("gui/img/approx_expon.png"));
+     funcBtn_3->setIcon(QIcon("gui/img/approx_expon_exp.png"));
+     funcBtn_4->setIcon(QIcon("gui/img/approx_ln.png"));
 
      funcBtn_0->setIconSize(QSize(200, 60));
      funcBtn_1->setIconSize(QSize(200, 60));

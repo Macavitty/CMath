@@ -12,9 +12,9 @@ static QList<double>* x = new QList<double>,
 static double function(double x, double y){
     switch (func){
     case 1:
-        return x*x - x/4.0 + 8 - y/16.0;
+        return x*x + 3*x + y*0.25;
     case 0:
-        return y/5.0 + x/6.0 + 1/7.0;
+        return 1.2*x - y;
     }
 }
 
