@@ -149,6 +149,8 @@ QList<double>* approximate(QList<QPair<double, double>> *dots, int func){
         return apprExp(dots);
     case 4:
         return apprLogarithm(dots);
+    case 0:
+        return apprLinear(dots);
     default:
         return apprLinear(dots);
     }

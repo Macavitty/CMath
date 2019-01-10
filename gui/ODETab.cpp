@@ -41,6 +41,17 @@ static void prettyAnsField(QTextEdit* field, int w, int h){
     field->setAlignment(Qt::AlignCenter);
 }
 
+static void unsetErr(QLineEdit *field) {
+    field->setStyleSheet("border: none");
+    field->setStyleSheet("border: 1px solid #C3A8A8");
+}
+
+static void setErr(QString msg, QLineEdit *field) {
+    QToolTip::showText(field->pos(), msg, field);
+    field->setStyleSheet("border: 1px solid red;");
+}
+
+
 ODETab::ODETab(QWidget *parent) : QWidget(parent) {
 
     auto *mainLayout = new QHBoxLayout;
@@ -144,18 +155,11 @@ bool ODETab::validateInput(){
         setErr("", endXField);
         return false;
     }
+    if (eS.toDouble() <= 0) precisionField->setText("0,0001");
+    else if (eS.toDouble() >= 1) precisionField->setText("0,1");
+
     return true;
 
-}
-
-void ODETab::setErr(QString msg, QLineEdit *field) {
-    QToolTip::showText(field->pos(), msg, field);
-    field->setStyleSheet("border: 1px solid red;");
-}
-
-void ODETab::unsetErr(QLineEdit *field) {
-    field->setStyleSheet("border: none");
-    field->setStyleSheet("border: 1px solid #C3A8A8");
 }
 
 void ODETab::prettyBtn(QPushButton* btn,
@@ -187,28 +191,32 @@ void ODETab::solve(){
     unsetErr(x0Field);
     unsetErr(y0Field);
     unsetErr(endXField);
-    QList<QPair<double, double>> *dots;
-    QList<double>* resultCoeffs;
     if (validateInput()){
         double e = precisionField->text().replace(",", ".").toDouble(),
                 x0 = x0Field->text().replace(",", ".").toDouble(),
                 y0 = y0Field->text().replace(",", ".").toDouble(),
                 endx = endXField->text().replace(",", ".").toDouble();
-        dots = odeSolve(5, x0, endx, y0, e);
-        resultCoeffs = approximate(dots, btnGroup->checkedId());
-        redrawPlot(dots, resultCoeffs, btnGroup->checkedId());
+        redrawPlot(odeSolve(btnGroup->checkedId(), x0, endx, y0, e));
     }
+
 }
 
-void ODETab::redrawPlot(QList<QPair<double, double>> *dots, QList<double>* coefs, int func){
+void ODETab::redrawPlot(QList<QPair<double, double>> *dots){
 
     series->clear();
-    serInput->clear();
 
     double maxX = endXField->text().replace(",", ".").toDouble(),
-           minY = min(y0Field->text().replace(",", ".").toDouble(), function(func, coefs->first(), coefs->at(1), coefs->last(), maxX)),
+           maxY = pow(10, MAX_EDIT_CHARS + 1) * (-1),
            minX = x0Field->text().replace(",", ".").toDouble(),
-           maxY = max(y0Field->text().replace(",", ".").toDouble(), function(func, coefs->first(), coefs->at(1), coefs->last(), maxX));
+           minY = pow(10, MAX_EDIT_CHARS + 1);
+
+    // fill appr function series
+    for (auto i = 0; i < dots->size(); i++){
+        double y = dots->at(i).second;
+        series->append(dots->at(i).first, y);
+        maxY = max(y, maxY);
+        minY = min(y, minY);
+    }
 
     int steps = 420;
     double step = (maxX - minX)/steps;
@@ -220,24 +228,13 @@ void ODETab::redrawPlot(QList<QPair<double, double>> *dots, QList<double>* coefs
     maxX += step*10;
     minY -= step*10;
     maxY += step*10;
-    // fill appr function series
-    double i = minX - step*10;
-    if (coefs != NULL){
-        while (i < maxX + step*10) {
-            series->append(i, function(func, coefs->first(), coefs->at(1), coefs->last(), i));
-            i += step;
-        }
-    }
-    for (auto i = 0; i < dots->size(); i++){
-        serInput->append(dots->at(i).first, dots->at(i).second);
-    }
 
     int tick = 20;
 
     scaleAxes(chart->axisX(), minX-delta, maxX+delta, tick);
     scaleAxes(chart->axisY(), minY-delta, maxY+delta, tick);
 
-    }
+}
 
 void ODETab::showErr(QString msg, QWidget *w) {
     QToolTip::showText(w->pos()*60/7, msg, w);
@@ -253,14 +250,9 @@ void ODETab::setPlotArea(QChart *chart, QChartView *view, QValueAxis *x, QValueA
     chart->setTitle("");
 
     series->setName("аппроксимирующая функция");
-    serInput->setName("значение функции в узлах");
-    serInput->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-    serInput->setMarkerSize(9.0);
 
     // add series to chart
     chart->addSeries(series);
-    //chart->addSeries(serInput);
-
 
     // legend settings
     chart->legend()->setAlignment(Qt::AlignBottom);
@@ -271,34 +263,16 @@ void ODETab::setPlotArea(QChart *chart, QChartView *view, QValueAxis *x, QValueA
     x->setTitleText("X");
     chart->addAxis(x, Qt::AlignBottom);
     series->attachAxis(x);
-    serInput->attachAxis(x);
-
 
     // y axis
     y->setLabelFormat("%.2f");
-    y->setTitleText("Y'");
+    y->setTitleText("Y");
     chart->addAxis(y, Qt::AlignLeft);
     series->attachAxis(y);
-    serInput->attachAxis(y);
 
     view->setFixedHeight(1000);
     view->setFixedWidth(1000);
     view->setRenderHint(QPainter::Antialiasing);
 }
-
-double ODETab::function(int f, double a, double b, double c, double x){
-    switch (f) {
-    case 1:
-        return x*x*a + x*b + c;
-    default:
-        return x*a + b;
-    }
-}
-
-double ODETab::function(int f, double a, double b, double x){
-    function(f, a, b, 0, x);
-}
-
-
 
 

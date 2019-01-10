@@ -41,15 +41,8 @@ private:
     void redrawPlot(QList<double>* before, QList<double>* after, int);
     void scaleAxes(QAbstractAxis*, double min, double max, int step);
     QList<QPair<double, double>>* getInputDots();
-    void fillCoeffArea(int, QList<double>* before, QList<double>* after);
-    //void tuneLineEdit(QLineEdit *, QValidator *);
-    double function(int f, double a, double b, double x);
-    double function(int f, double a, double b, double c, double x);
     bool validateInput();
-    void setErr(QString msg, QLineEdit*);
-    void unsetErr(QLineEdit*);
-    //void setBtnGroup();
-    void redrawPlot(QList<QPair<double, double>> *dots, QList<double>* coeffs, int func);
+    void redrawPlot(QList<QPair<double, double>> *dots);
 };
 
 

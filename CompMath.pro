@@ -1,6 +1,8 @@
 #TARGET = CompMath
-
+QT += quick charts
+QT += quickwidgets
 QT += charts
+#CONFIG += c++11
 requires(qtConfig(combobox))
 
 HEADERS = \
@@ -37,5 +39,6 @@ INCLUDEPATH = \
 
 CONFIG += qt 
 
+DISTFILES += \
+    last_tab.qml
 DISTFILES +=
-
