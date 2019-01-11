@@ -196,7 +196,7 @@ void ODETab::solve(){
                 x0 = x0Field->text().replace(",", ".").toDouble(),
                 y0 = y0Field->text().replace(",", ".").toDouble(),
                 endx = endXField->text().replace(",", ".").toDouble();
-        redrawPlot(odeSolve(btnGroup->checkedId(), x0, endx, y0, e));
+        redrawPlot(odeSolve(btnGroup->checkedId(), x0, endx + 1, y0, e));
     }
 
 }

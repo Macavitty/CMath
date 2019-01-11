@@ -1,7 +1,8 @@
 #include "ODESolver.h"
 
-static int n, func;
+static int n, func, c;
 static double h, yo, x0, xn, e;
+const int MAX_ITERATIONS_N = 10000;
 
 static QList<double>* x = new QList<double>,
     *y = new QList<double>,
@@ -34,13 +35,15 @@ static double adams_correct(int i){
 
 static void restart(bool isFirstTime){
     if (isFirstTime){
-        n = 20;
+        c = 0;
+        n = 10;
         h = (xn - x0)/n;
     }
     else{
         n *= 2;
         h /= 2.0;
     }
+    c++;
     dy->clear();
     y_correct->clear();
     y->clear();
@@ -57,9 +60,9 @@ static void restart(bool isFirstTime){
         y->append(y->at(i-1) + adams(i-1));
         yp->append(function(x0 + (i)*h, y->at(i)));
         double y_correct = y->at(i-1) + adams_correct(i);
-        if (fabs(y->last() - y_correct)/29 > e) restart(false);
+        if (fabs(y->last() - y_correct) > e /*&& c < MAX_ITERATIONS_N*/) restart(false);
         y->replace(i, y_correct);
-        yp->replace(i, function(x0 + (i)*h, y->at(i)));
+        yp->replace(i, function(x0 + (i)*h, y_correct));
     }
 }
 
